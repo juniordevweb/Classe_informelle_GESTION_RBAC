@@ -58,7 +58,7 @@
 
     <div class="form-group text-center m-t-40">
         <div class="col-12">
-            <button class="btn btn-primary btn-lg w-lg waves-effect waves-light" 
+            <button class="btn btn-primary  btn-lg w-lg " 
                     type="submit">
                 se connecter
             </button>

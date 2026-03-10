@@ -16,7 +16,7 @@ session()->get('role_id')
                                     <li _msthidden="1"><a href="javascript:void(0)" class="dropdown-item" _msthidden="1"><i class="md md-face-unlock mr-2"></i><font _mstmutation="1" _msttexthash="94315" _msthidden="1" _msthash="18"> Profile</font><div class="ripple-wrapper"></div></a></li>
                                     <li _msthidden="1"><a href="javascript:void(0)" class="dropdown-item" _msthidden="1"><i class="md md-settings mr-2"></i><font _mstmutation="1" _msttexthash="117221" _msthidden="1" _msthash="19"> Settings</font></a></li>
                                     <li _msthidden="1"><a href="javascript:void(0)" class="dropdown-item" _msthidden="1"><i class="md md-lock mr-2"></i><font _mstmutation="1" _msttexthash="156065" _msthidden="1" _msthash="20"> Lock screen</font></a></li>
-                                    <li _msthidden="1"><a href="javascript:void(0)" class="dropdown-item" _msthidden="1"><i class="md md-settings-power mr-2"></i><font _mstmutation="1" _msttexthash="79768" _msthidden="1" _msthash="21"> Logout</font></a></li>
+                                  <li><a href="<?= base_url('logout') ?>" class="dropdown-item"><i class="md md-settings-power mr-2"></i> Logout</a></li>
                                 </ul>
                             </div>
                             

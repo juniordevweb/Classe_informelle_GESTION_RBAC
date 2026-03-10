@@ -14,7 +14,7 @@ class C_AuthController extends BaseController
     public function login()
     {
         
-        return view('V_Login');
+        return view('V_connexion');
     }
 
   
