@@ -20,56 +20,63 @@ session()->get('role_id')
                                 </ul>
                             </div>
                             
-                            <p class="text-muted m-0" _msttexthash="265590" _msthash="22">Administrateur</p>
+                            <p class="text-muted m-0"><?= session()->get('role') ?? 'Invité' ?></p>
                         </div>
                     </div>
                     <!--- Divider -->
                     <div id="sidebar-menu">
-                        <ul>
-                            <li class="active">
-                                <a href="<?= base_url('/dashboard')?>" class="waves-effect active"><i class="md md-home"></i><span _msttexthash="226772" _msthash="23"> Tableau de bord </span></a>
-                            </li>
+    <ul>
+        <!-- Tableau de bord -->
+        <li class="<?= (uri_string() == 'dashboard') ? 'active' : '' ?>">
+            <a href="<?= base_url('/dashboard')?>" class="waves-effect">
+                <i class="md md-home"></i>
+                <span>Tableau de bord</span>
+            </a>
+        </li>
 
-                            <li class="">
-                                <a href="<?= base_url('')?>" class="waves-effect active"><i class="md md-person"></i><span _msttexthash="226772" _msthash="23"> Facilitateur </span></a>
-                            </li>
+        <!-- Facilitateur -->
+        <li class="<?= (uri_string() == 'facilitateur') ? 'active' : '' ?>">
+            <a href="<?= base_url('facilitateur')?>" class="waves-effect">
+                <i class="md md-person"></i>
+                <span>Facilitateur</span>
+            </a>
+        </li>
 
-                            <li class="">
-                                <a href="<?= base_url('')?>" class="waves-effect active"><i class="md md-people"></i><span _msttexthash="226772" _msthash="23"> Superviseur </span></a>
-                            </li>
+        <!-- Superviseur -->
+        <li class="<?= (uri_string() == 'superviseur') ? 'active' : '' ?>">
+            <a href="<?= base_url('superviseur')?>" class="waves-effect">
+                <i class="md md-people"></i>
+                <span>Superviseur</span>
+            </a>
+        </li>
 
-                            <li class="">
-                                <a href="<?= base_url('')?>" class="waves-effect active"><i class="md md-laptop"></i><span _msttexthash="226772" _msthash="23"> Operateur</span></a>
-                            </li>
+        <!-- Opérateur -->
+        <li class="<?= (uri_string() == 'operateur') ? 'active' : '' ?>">
+            <a href="<?= base_url('operateur')?>" class="waves-effect">
+                <i class="md md-laptop"></i>
+                <span>Opérateur</span>
+            </a>
+        </li>
 
-                            
-                            <li class="has_sub">
-                                <a href="#" class="waves-effect"><i class="md md-now-widgets"></i><span _msttexthash="77805" _msthash="52"> Formes </span><span class="pull-right"><i class="md md-add"></i></span></a>
-                                <ul class="list-unstyled" _msthidden="8">
-                                    <li _msthidden="1"><a href="form-elements.html" _msttexthash="283725" _msthidden="1" _msthash="53">General Elements</a></li>
-                                    <li _msthidden="1"><a href="form-validation.html" _msttexthash="256113" _msthidden="1" _msthash="54">Form Validation</a></li>
-                                    <li _msthidden="1"><a href="form-advanced.html" _msttexthash="196612" _msthidden="1" _msthash="55">Advanced Form</a></li>
-                                    <li _msthidden="1"><a href="form-wizard.html" _msttexthash="155545" _msthidden="1" _msthash="56">Form Wizard</a></li>
-                    
-                                </ul>
-                            </li>
-                            
-                            
-                             <?php if(session()->get('role_id') == 1): ?>
-                            <li class="has_sub">
-                                <a href="#" class="waves-effect"><i class="md md-settings"></i> <span _msttexthash="114426" _msthash="61"> Parametres </span><span class="pull-right"><i class="md md-add"></i></span></a>
-                                <ul class="list-unstyled" _msthidden="4">
-                                    <li _msthidden="1"><a href="<?= base_url('users')?>" _msttexthash="172172" _msthidden="1" _msthash="62">Gestion users</a></li>
-                                    <li _msthidden="1"><a href="<?= base_url('profils')?>" _msttexthash="125515" _msthidden="1" _msthash="63">Gestion profil</a></li>
-                                    <li _msthidden="1"><a href="tables-editable.html" _msttexthash="218270" _msthidden="1" _msthash="64">Editable Table</a></li>
-                                </ul>
-                            </li>
-                            <?php endif; ?>
+    
 
-                           
-                        </ul>
-                        <div class="clearfix"></div>
-                    </div>
+        <!-- Paramètres (visible seulement admin) -->
+        <?php if(session()->get('role_id') == 1): ?>
+        <li class="has_sub <?= (in_array(uri_string(), ['users','profils','tables-editable'])) ? 'active' : '' ?>">
+            <a href="javascript:void(0);" class="waves-effect">
+                <i class="md md-settings"></i>
+                <span>Paramètres</span>
+                <span class="pull-right"><i class="md md-add"></i></span>
+            </a>
+            <ul class="list-unstyled">
+                <li><a href="<?= base_url('users')?>">Gestion users</a></li>
+                <li><a href="<?= base_url('profils')?>">Gestion profil</a></li>
+            </ul>
+        </li>
+        <?php endif; ?>
+    </ul>
+    <div class="clearfix"></div>
+</div>
                     <div class="clearfix"></div>
                 </div><div class="slimScrollBar" style="background: rgb(122, 134, 143); width: 5px; position: absolute; top: 0px; opacity: 0.4; display: block; border-radius: 7px; z-index: 99; right: 1px; height: 680.923px; visibility: visible;"></div><div class="slimScrollRail" style="width: 5px; height: 100%; position: absolute; top: 0px; display: none; border-radius: 7px; background: rgb(51, 51, 51); opacity: 0.2; z-index: 90; right: 1px;"></div></div>
             </div>

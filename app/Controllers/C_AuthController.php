@@ -13,8 +13,11 @@ class C_AuthController extends BaseController
 
     public function login()
     {
+        
         return view('V_Login');
     }
+
+  
 
 public function process()
 {
@@ -27,11 +30,26 @@ public function process()
         return redirect()->back()->with('error', 'Email ou mot de passe incorrect');
     }
 
+    // Connexion DB
+    $db = \Config\Database::connect();
+
+    // Récupérer le rôle
+    $role = $db->table('roles')
+               ->select('nom_role')
+               ->where('id', $user['role_id'])
+               ->get()
+               ->getRowArray();
+
+    // Nom du rôle sécurisé
+    $roleName = $role ? $role['nom_role'] : 'Invité';
+
+    // Session
     session()->set([
         'user_id'   => $user['id'],
         'nom'       => $user['nom'],
         'email'     => $user['email'],
         'role_id'   => $user['role_id'],
+        'role'      => $roleName,
         'logged_in' => true
     ]);
 

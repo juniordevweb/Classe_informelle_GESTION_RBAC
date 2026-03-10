@@ -4,7 +4,7 @@
                 <!-- LOGO -->
                 <div class="topbar-left">
                     <div class="text-center">
-                        <a href="index.php" class="logo"><i class="md md-terrain"></i> <span>CLASSE PASSERELLE </span></a>
+                        <a href="" class="logo"><i class="md md-terrain"></i> <span>CLASSE PASSERELLE </span></a>
                     </div>
                 </div>
                 <!-- Button mobile view to collapse sidebar menu -->

@@ -26,7 +26,7 @@
             <div class="card card-pages">
                 <div class="card-header bg-img"> 
                     <div class="bg-overlay"></div>
-                    <h3 class="text-center m-t-10 text-white"> Connexion sur <strong>Classe Passerelles</strong> </h3>
+                    <h3 class="text-center m-t-10 text-white"> <strong>Connexion</strong> </h3>
                 </div> 
                 <?php if (session()->getFlashdata('error')): ?>
                 <p style="color:red"><?= session()->getFlashdata('error') ?></p>
@@ -60,7 +60,7 @@
         <div class="col-12">
             <button class="btn btn-primary btn-lg w-lg waves-effect waves-light" 
                     type="submit">
-                Log In
+                se connecter
             </button>
         </div>
     </div>
