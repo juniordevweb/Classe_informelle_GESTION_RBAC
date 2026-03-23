@@ -36,5 +36,7 @@ $routes->group('', ['filter' => 'auth'], function($routes) {
     $routes->get('profils/delete/(:num)', 'C_ProfilController::delete/$1');
     $routes->post('profils/delete_ajax/(:num)', 'C_ProfilController::delete_ajax/$1');
     $routes->post('profils/save', 'C_ProfilController::save');
+    $routes->get('profils/getProfil/(:num)', 'Profils::getProfil/$1');
 
 });
+ 

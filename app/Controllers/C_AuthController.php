@@ -53,6 +53,8 @@ public function process()
         'logged_in' => true
     ]);
 
+  
+
     return redirect()->to('/dashboard');
 }
     public function logout()

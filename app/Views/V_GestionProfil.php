@@ -80,25 +80,27 @@
                         <div class="col-md-4">
                             <ul class="list-group">
                                 <?php foreach($menus as $menu): ?>
-                                <li class="list-group-item menu-item fw-bold" data-menu="<?= $menu['id'] ?>">
-                                    <i class="fa fa-folder me-2"></i> <?= $menu['nom_menu'] ?>
-                                </li>
-                                <ul class="list-group sous-menu d-none" id="add_menu_<?= $menu['id'] ?>">
-                                    <?php if(!empty($menu['sous_menus'])): ?>
-                                        <?php foreach($menu['sous_menus'] as $sm): ?>
-                                        <li class="list-group-item sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
-                                            <i class="fa fa-angle-right me-2"></i> <?= $sm['nom_sous_menu'] ?>
-                                        </li>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <li class="list-group-item sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $menu['id'] ?>">
-                                            <i class="fa fa-angle-right me-2"></i> <?= $menu['nom_menu'] ?>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
+                                    <li class="list-group-item menu-item fw-bold" data-menu="<?= $menu['id'] ?>">
+                                        <i class="fa fa-folder me-2"></i> <?= $menu['nom_menu'] ?>
+                                    </li>
+
+                                    <ul class="d-none" id="add_menu_<?= $menu['id'] ?>">
+                                        <?php if(!empty($menu['sous_menus'])): ?>
+                                            <?php foreach($menu['sous_menus'] as $sm): ?>
+                                                <li class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
+                                                    <?= $sm['nom_sous_menu'] ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <li class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $menu['id'] ?>">
+                                                <?= $menu['nom_menu'] ?>
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
+
                         <!-- PERMISSIONS -->
                         <div class="col-md-8">
                             <div id="addPermissionBox" class="d-none">
@@ -154,22 +156,23 @@
                                 <li class="list-group-item menu-item fw-bold" data-menu="<?= $menu['id'] ?>">
                                     <i class="fa fa-folder me-2"></i> <?= $menu['nom_menu'] ?>
                                 </li>
-                                <ul class="list-group sous-menu d-none" id="edit_menu_<?= $menu['id'] ?>">
+                                <div class="d-none" id="edit_menu_<?= $menu['id'] ?>">
                                     <?php if(!empty($menu['sous_menus'])): ?>
                                         <?php foreach($menu['sous_menus'] as $sm): ?>
-                                        <li class="list-group-item sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
-                                            <i class="fa fa-angle-right me-2"></i> <?= $sm['nom_sous_menu'] ?>
-                                        </li>
+                                            <div class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
+                                                <?= $sm['nom_sous_menu'] ?>
+                                            </div>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <li class="list-group-item sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $menu['id'] ?>">
-                                            <i class="fa fa-angle-right me-2"></i> <?= $menu['nom_menu'] ?>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
+    <div class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $menu['id'] ?>">
+        <?= $menu['nom_menu'] ?>
+    </div>
+<?php endif; ?>
+                                </div>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
+
                         <!-- PERMISSIONS -->
                         <div class="col-md-8">
                             <div id="editPermissionBox" class="d-none">
@@ -187,7 +190,7 @@
                                 </table>
                             </div>
                             <div id="editPermissionMessage" class="alert alert-info">
-                                Cliquez sur un sous menu pour afficher les permissions
+                                Cliquez sur un menu pour afficher les sous-menus et permissions
                             </div>
                         </div>
                     </div>
@@ -200,102 +203,221 @@
         </div>
     </div>
 </div>
-
-<!-- ================= SCRIPT GLOBAL ================= -->
+<!-- ================= SCRIPT MODAL EDIT & ADD ================= -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 
-    // SweetAlert success
-    <?php if(session()->getFlashdata('success')): ?>
-    Swal.fire({icon:'success', title:'Succès !', text:"<?= session()->getFlashdata('success') ?>", timer:2000, showConfirmButton:false});
-    <?php endif; ?>
-    <?php if(session()->getFlashdata('success_update')): ?>
-    Swal.fire({icon:'success', title:'Mis à jour !', text:"<?= session()->getFlashdata('success_update') ?>", timer:2000, showConfirmButton:false});
-    <?php endif; ?>
+    // ================== GLOBAL ==================
+   let currentRolePerms = [];
 
-    // Permissions render function
-  function renderPermissions(label, menuId, sousMenuId, permissions, currentRolePerms) {
-    // On crée une seule ligne pour le sous-menu
-    let row = `<tr>
-        <td class="text-start fw-bold">${label}</td>
-        <td><input type="checkbox" class="edit-permission" name="permissions[]" value="${menuId}|${sousMenuId}|1" ${isChecked(menuId, sousMenuId, 1, currentRolePerms)}></td>
-        <td><input type="checkbox" class="edit-permission" name="permissions[]" value="${menuId}|${sousMenuId}|2" ${isChecked(menuId, sousMenuId, 2, currentRolePerms)}></td>
-        <td><input type="checkbox" class="edit-permission" name="permissions[]" value="${menuId}|${sousMenuId}|3" ${isChecked(menuId, sousMenuId, 3, currentRolePerms)}></td>
-        <td><input type="checkbox" class="edit-permission" name="permissions[]" value="${menuId}|${sousMenuId}|4" ${isChecked(menuId, sousMenuId, 4, currentRolePerms)}></td>
-    </tr>`;
-    return row;
+   
+
+    function renderPermissions(label, menuId, sousMenuId) {
+        return `
+            <tr>
+                <td class="text-start fw-bold">${label}</td>
+                <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|1" ${isChecked(menuId, sousMenuId, 1)}></td>
+                <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|2" ${isChecked(menuId, sousMenuId, 2)}></td>
+                <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|3" ${isChecked(menuId, sousMenuId, 3)}></td>
+                <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|4" ${isChecked(menuId, sousMenuId, 4)}></td>
+            </tr>
+        `;
+    }
+
+    // OUVERTURE MODAL EDIT
+   // ================= EDIT MODAL =================
+let currentPerms = [];
+
+function isChecked(menuId, sousMenuId, permId){
+
+return currentPerms.some(p => {
+
+return (
+String(p.menu_id) === String(menuId) &&
+(p.sous_menu_id == 0 || String(p.sous_menu_id) === String(sousMenuId)) &&
+String(p.permission_id) === String(permId)
+);
+
+}) ? 'checked' : '';
+
+}
+document.querySelectorAll('.editBtn').forEach(btn => {
+
+btn.addEventListener('click', async function(){
+
+const roleId = this.dataset.id;
+const roleNom = this.dataset.nom;
+
+document.getElementById('edit_role_id').value = roleId;
+document.getElementById('edit_nom_role').value = roleNom;
+
+const res = await fetch(`<?= base_url('profils/get/') ?>${roleId}`);
+const data = await res.json();
+
+currentPerms = data.permissions || [];
+
+let html = '';
+
+document.querySelectorAll("#editProfil .menu-item").forEach(menu => {
+
+const menuId = menu.dataset.menu;
+
+document.querySelectorAll(`#edit_menu_${menuId} .sousMenuItem`).forEach(sm => {
+
+const sousMenuId = sm.dataset.sousmenu;
+const label = sm.innerText.trim();
+
+html += `
+<tr>
+
+<td class="text-start fw-bold">${label}</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|1"
+${isChecked(menuId, sousMenuId, 1)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|2"
+${isChecked(menuId, sousMenuId, 2)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|3"
+${isChecked(menuId, sousMenuId, 3)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|4"
+${isChecked(menuId, sousMenuId, 4)}>
+</td>
+
+</tr>
+`;
+
+});
+
+});
+
+document.getElementById('editPermissionContent').innerHTML = html;
+
+document.getElementById('editPermissionBox').classList.remove('d-none');
+document.getElementById('editPermissionMessage').classList.add('d-none');
+
+});
+
+});
+
+
+
+  // ================== ADD MODAL ==================
+
+let addPermBox = document.getElementById('addPermissionBox');
+let addPermContent = document.getElementById('addPermissionContent');
+
+let selectedPermissions = [];
+
+document.querySelectorAll("#addProfil .menu-item").forEach(menu => {
+
+menu.addEventListener('click', function(){
+
+const menuId = this.dataset.menu;
+
+addPermBox.classList.remove('d-none');
+document.getElementById('addPermissionMessage').classList.add('d-none');
+
+let html = '';
+
+document.querySelectorAll(`#add_menu_${menuId} .sousMenuItem`).forEach(sm => {
+
+const sousMenuId = sm.dataset.sousmenu;
+const label = sm.innerText.trim();
+
+function checkedValue(permissionId){
+
+const value = `${menuId}|${sousMenuId}|${permissionId}`;
+
+return selectedPermissions.includes(value) ? 'checked' : '';
+
 }
 
-// Helper pour cocher les permissions existantes
-function isChecked(menuId, sousMenuId, permId, currentRolePerms) {
-    return currentRolePerms.some(p => p.menu_id == menuId && p.sous_menu_id == sousMenuId && p.permission_id == permId) ? 'checked' : '';
+html += `
+<tr>
+
+<td class="text-start fw-bold">${label}</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|1"
+${checkedValue(1)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|2"
+${checkedValue(2)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|3"
+${checkedValue(3)}>
+</td>
+
+<td>
+<input type="checkbox"
+name="permissions[]"
+value="${menuId}|${sousMenuId}|4"
+${checkedValue(4)}>
+</td>
+
+</tr>
+`;
+
+});
+
+addPermContent.innerHTML = html;
+
+
+// sauvegarder les checkbox cochées
+document.querySelectorAll('#addPermissionContent input[type="checkbox"]').forEach(cb => {
+
+cb.addEventListener('change', function(){
+
+const val = this.value;
+
+if(this.checked){
+
+if(!selectedPermissions.includes(val)){
+selectedPermissions.push(val);
 }
 
-    // ----------------- Add Modal -----------------
-    let addPermBox = document.getElementById('addPermissionBox');
-    let addPermContent = document.getElementById('addPermissionContent');
-    document.querySelectorAll("#addProfil .menu-item").forEach(menu => {
-        menu.addEventListener('click', function() {
-            let id = this.dataset.menu;
-            document.querySelectorAll("#addProfil .sous-menu").forEach(sm => sm.classList.add('d-none'));
-            document.getElementById('add_menu_'+id).classList.remove('d-none');
-        });
-    });
-    document.querySelectorAll("#addProfil .sousMenuItem").forEach(sm => {
-        sm.addEventListener('click', function() {
-            const menuId = this.dataset.menu;
-            const sousMenuId = this.dataset.sousmenu;
-            const label = this.innerText.trim();
-            addPermBox.classList.remove('d-none');
-            document.getElementById('addPermissionMessage').classList.add('d-none');
-            addPermContent.innerHTML = `
-                <tr>
-                    <td class="text-start fw-bold">${label}</td>
-                    <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|1"></td>
-                    <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|2"></td>
-                    <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|3"></td>
-                    <td><input type="checkbox" name="permissions[]" value="${menuId}|${sousMenuId}|4"></td>
-                </tr>
-            `;
-        });
-    });
+}else{
 
-    // ----------------- Edit Modal -----------------
-    let currentRolePerms = [];
-    document.querySelectorAll('.editBtn').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const roleId = this.dataset.id;
-            const roleNom = this.dataset.nom;
-            const modal = document.getElementById('editProfil');
-            modal.querySelector('#edit_role_id').value = roleId;
-            modal.querySelector('#edit_nom_role').value = roleNom;
+selectedPermissions = selectedPermissions.filter(p => p !== val);
 
-            const res = await fetch(`<?= base_url('profils/getProfil/') ?>${roleId}`);
-            const data = await res.json();
-            currentRolePerms = data.permissions || [];
-        });
-    });
+}
 
-    document.querySelectorAll("#editProfil .menu-item").forEach(menu => {
-        menu.addEventListener('click', function() {
-            const id = this.dataset.menu;
-            document.querySelectorAll("#editProfil .sous-menu").forEach(sm => sm.classList.add('d-none'));
-            document.getElementById('edit_menu_'+id).classList.toggle('d-none');
-        });
-    });
+});
 
-    document.querySelectorAll("#editProfil .sousMenuItem").forEach(sm => {
-        sm.addEventListener('click', function() {
-            const menuId = this.dataset.menu;
-            const sousMenuId = this.dataset.sousmenu;
-            const label = this.innerText.trim();
-            document.getElementById('editPermissionBox').classList.remove('d-none');
-            document.getElementById('editPermissionMessage').classList.add('d-none');
-            document.getElementById('editPermissionContent').innerHTML = renderPermissions(label, menuId, sousMenuId, <?= json_encode($permissions) ?>, currentRolePerms);
-        });
-    });
+});
 
-    // ----------------- DELETE -----------------
+});
+
+});
+
+    // ================== DELETE ==================
     document.querySelectorAll('.deleteBtn').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -331,6 +453,97 @@ function isChecked(menuId, sousMenuId, permId, currentRolePerms) {
     });
 
 });
+
+
+ 
+
+
+
+// ================= SWEET ALERT EDIT =================
+
+const editForm = document.querySelector("#editProfil form");
+
+if(editForm){
+
+editForm.addEventListener("submit", function(e){
+
+e.preventDefault();
+
+let formData = new FormData(this);
+
+fetch(this.action,{
+method:"POST",
+body:formData
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.status === "success"){
+
+Swal.fire({
+icon:"success",
+title:"Succès",
+text:data.message
+}).then(()=>{
+location.reload();
+});
+
+}else{
+
+Swal.fire("Erreur",data.message,"error");
+
+}
+
+});
+
+});
+
+}
+
+
+
+
+// ================= SWEET ALERT ADD =================
+
+const addForm = document.querySelector("#addProfil form");
+
+if(addForm){
+
+addForm.addEventListener("submit", function(e){
+
+e.preventDefault();
+
+let formData = new FormData(this);
+
+fetch(this.action,{
+method:"POST",
+body:formData
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.status === "success"){
+
+Swal.fire({
+icon:"success",
+title:"Succès",
+text:data.message
+}).then(()=>{
+location.reload();
+});
+
+}else{
+
+Swal.fire("Erreur",data.message,"error");
+
+}
+
+});
+
+});
+
+}
+
 </script>
 
 <?= $this->include('templates/footer') ?>

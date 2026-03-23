@@ -1,5 +1,6 @@
 <?php
-session()->get('role_id')
+session()->get('role_id');
+session()->get('')
 ?>
 <div class="left side-menu">
                 <div class="slimScrollDiv" style="position: relative; overflow: hidden; width: auto; height: 706px;"><div class="sidebar-inner slimscrollleft" style="overflow: hidden; width: auto; height: 706px;">

@@ -49,29 +49,32 @@ class C_ProfilController extends BaseController
         return view('V_GestionProfil', $data);
     }
 
-    public function save()
-    {
-        $nom_role = $this->request->getPost('nom_role');
-        $permissions = $this->request->getPost('permissions');
+   public function save()
+{
+    $nom_role = $this->request->getPost('nom_role');
+    $permissions = $this->request->getPost('permissions');
 
-        $this->roleModel->save(['nom_role' => $nom_role]);
-        $role_id = $this->roleModel->getInsertID();
+    $this->roleModel->save(['nom_role' => $nom_role]);
+    $role_id = $this->roleModel->getInsertID();
 
-        if($permissions){
-            foreach($permissions as $perm){
-                list($menu_id, $sous_menu_id, $permission_id) = explode('|', $perm);
+    if($permissions){
+        foreach($permissions as $perm){
+            list($menu_id, $sous_menu_id, $permission_id) = explode('|', $perm);
 
-                $this->rolePermissionModel->save([
-                    'role_id' => $role_id,
-                    'menu_id' => $menu_id,
-                    'sous_menu_id' => $sous_menu_id,
-                    'permission_id' => $permission_id
-                ]);
-            }
+            $this->rolePermissionModel->save([
+                'role_id' => $role_id,
+                'menu_id' => $menu_id,
+                'sous_menu_id' => $sous_menu_id,
+                'permission_id' => $permission_id
+            ]);
         }
-
-        return redirect()->to('/profils')->with('success','Profil créé avec permissions');
     }
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Profil créé avec succès'
+    ]);
+}
 
   public function getProfil($id)
 {
@@ -110,9 +113,10 @@ class C_ProfilController extends BaseController
                 ]);
             }
         }
-
-        return redirect()->to('/profils')
-                         ->with('success_update', 'Profil modifié avec succès');
+return $this->response->setJSON([
+'status' => 'success',
+'message' => 'Profil modifié avec succès'
+]);
     }
 
     // Supprimer profil
