@@ -67,6 +67,18 @@ Counter Up
 <script>
     const BASE_URL = "<?= base_url() ?>";
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        <?php if (session()->getFlashdata('access_denied')): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Acces refuse',
+                text: "<?= esc(session()->getFlashdata('access_denied'), 'js') ?>",
+                confirmButtonColor: '#d33'
+            });
+        <?php endif; ?>
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="<?= base_url('assets/js/ien-search.js') ?>"></script>

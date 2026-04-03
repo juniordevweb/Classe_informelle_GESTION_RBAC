@@ -5,10 +5,19 @@ namespace App\Filters;
 use CodeIgniter\Filters\FilterInterface;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-use Config\Database;
 
 class PermissionFilter implements FilterInterface
 {
+    protected function getDeniedMessage($permissionId): string
+    {
+        return match ((int) $permissionId) {
+            2 => "Acces refuse : vous n'avez pas le droit d'ajouter.",
+            3 => "Acces refuse : vous n'avez pas le droit de modifier.",
+            4 => "Acces refuse : vous n'avez pas le droit de supprimer.",
+            default => "Acces refuse : vous n'avez pas le droit d'acceder a cette ressource.",
+        };
+    }
+
     public function before(RequestInterface $request, $arguments = null)
     {
         if (!session()->get('logged_in')) {
@@ -26,21 +35,26 @@ class PermissionFilter implements FilterInterface
 
         [$menuId, $sousMenuId, $permissionId] = $arguments;
 
-        $db = Database::connect();
+        $permissions = session()->get('user_permissions') ?? [];
+        $permission = null;
 
-        $permission = $db->table('role_permissions')
-            ->where('role_id', $role_id)
-            ->where('menu_id', $menuId)
-            ->where('permission_id', $permissionId)
-            ->groupStart()
-                ->where('sous_menu_id', $sousMenuId)
-                ->orWhere('sous_menu_id', 0)
-            ->groupEnd()
-            ->get()
-            ->getRowArray();
+        foreach ($permissions as $currentPermission) {
+            $dbSousMenuId = ((int) ($currentPermission['sous_menu_id'] ?? 0) === 0)
+                ? (int) ($currentPermission['menu_id'] ?? 0)
+                : (int) ($currentPermission['sous_menu_id'] ?? 0);
+
+            if (
+                (int) ($currentPermission['menu_id'] ?? 0) === (int) $menuId &&
+                $dbSousMenuId === (int) $sousMenuId &&
+                (int) ($currentPermission['permission_id'] ?? 0) === (int) $permissionId
+            ) {
+                $permission = $currentPermission;
+                break;
+            }
+        }
 
         if (!$permission) {
-            return redirect()->to('/dashboard')->with('error', 'Accès refusé');
+            return redirect()->back()->with('access_denied', $this->getDeniedMessage($permissionId));
         }
     }
 

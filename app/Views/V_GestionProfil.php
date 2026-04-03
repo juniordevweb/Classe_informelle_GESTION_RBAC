@@ -1,6 +1,31 @@
 <?= $this->include('templates/header') ?>
 <?= $this->include('templates/top_bar') ?>
-<?= $this->include('templates/left_sidebar') ?><br><br><br>
+<?= $this->include('templates/left_sidebar') ?>
+<?php
+$user_permissions = $user_permissions ?? [];
+
+$hasProfilActionPermission = static function (array $permissions, int $menuId, int $sousMenuId, int $permissionId): bool {
+    foreach ($permissions as $permission) {
+        $dbSousMenu = ((int) ($permission['sous_menu_id'] ?? 0) === 0)
+            ? (int) ($permission['menu_id'] ?? 0)
+            : (int) ($permission['sous_menu_id'] ?? 0);
+
+        if (
+            (int) ($permission['menu_id'] ?? 0) === $menuId &&
+            $dbSousMenu === $sousMenuId &&
+            (int) ($permission['permission_id'] ?? 0) === $permissionId
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+$canAddProfil = $hasProfilActionPermission($user_permissions, 6, 6, 2);
+$canEditProfil = $hasProfilActionPermission($user_permissions, 6, 6, 3);
+$canDeleteProfil = $hasProfilActionPermission($user_permissions, 6, 6, 4);
+?><br><br><br>
 
 <div class="content-page">
     <div class="container-fluid mt-4">
@@ -10,10 +35,12 @@
                 <h4 class="mb-0">
                     <i class="fa fa-user-shield me-2"></i> Gestion des Profils
                 </h4>
-                <button data-bs-toggle="modal" data-bs-target="#addProfil" 
-                        class="btn btn-primary btn-sm">
-                    <i class="fa fa-plus"></i> Ajouter Profil
-                </button>
+                <?php if ($canAddProfil): ?>
+                    <button data-bs-toggle="modal" data-bs-target="#addProfil"
+                            class="btn btn-primary btn-sm">
+                        <i class="fa fa-plus"></i> Ajouter Profil
+                    </button>
+                <?php endif; ?>
             </div>
 
             <div class="card-body">
@@ -26,7 +53,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach($roles as $r): ?>
+                            <?php foreach ($roles as $r): ?>
                             <tr>
                                 <td>
                                     <span class="badge bg-secondary p-2">
@@ -34,18 +61,22 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="#" class="btn btn-sm btn-outline-primary editBtn"
-                                       data-id="<?= $r['id'] ?>"
-                                       data-nom="<?= $r['nom_role'] ?>"
-                                       data-bs-toggle="modal"
-                                       data-bs-target="#editProfil">
-                                       <i class="fa fa-edit"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-sm btn-outline-danger deleteBtn"
-                                       data-id="<?= $r['id'] ?>"
-                                       data-nom="<?= $r['nom_role'] ?>">
-                                       <i class="fa fa-trash"></i>
-                                    </a>
+                                    <?php if ($canEditProfil): ?>
+                                        <a href="#" class="btn btn-sm btn-outline-primary editBtn"
+                                           data-id="<?= $r['id'] ?>"
+                                           data-nom="<?= $r['nom_role'] ?>"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#editProfil">
+                                           <i class="fa fa-edit"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($canDeleteProfil): ?>
+                                        <a href="#" class="btn btn-sm btn-outline-danger deleteBtn"
+                                           data-id="<?= $r['id'] ?>"
+                                           data-nom="<?= $r['nom_role'] ?>">
+                                           <i class="fa fa-trash"></i>
+                                        </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -59,6 +90,7 @@
 </div>
 
 <!-- ================= MODAL AJOUT PROFIL ================= -->
+<?php if ($canAddProfil): ?>
 <div class="modal fade" id="addProfil">
     <div class="modal-dialog modal-xl">
         <div class="modal-content shadow">
@@ -77,14 +109,14 @@
                         <!-- MENUS -->
                         <div class="col-md-4">
                             <ul class="list-group">
-                                <?php foreach($menus as $menu): ?>
+                                <?php foreach ($menus as $menu): ?>
                                     <li class="list-group-item menu-item fw-bold" data-menu="<?= $menu['id'] ?>">
                                         <i class="fa fa-folder me-2"></i> <?= $menu['nom_menu'] ?>
                                     </li>
 
                                     <ul class="d-none" id="add_menu_<?= $menu['id'] ?>">
-                                        <?php if(!empty($menu['sous_menus'])): ?>
-                                            <?php foreach($menu['sous_menus'] as $sm): ?>
+                                        <?php if (!empty($menu['sous_menus'])): ?>
+                                            <?php foreach ($menu['sous_menus'] as $sm): ?>
                                                 <li class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
                                                     <?= $sm['nom_sous_menu'] ?>
                                                 </li>
@@ -129,8 +161,10 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
 
 <!-- ================= MODAL EDIT PROFIL ================= -->
+<?php if ($canEditProfil): ?>
 <div class="modal fade" id="editProfil" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content shadow-lg border-0 rounded-4">
@@ -150,13 +184,13 @@
                         <!-- MENUS -->
                         <div class="col-md-4">
                             <ul class="list-group">
-                                <?php foreach($menus as $menu): ?>
+                                <?php foreach ($menus as $menu): ?>
                                 <li class="list-group-item menu-item fw-bold" data-menu="<?= $menu['id'] ?>">
                                     <i class="fa fa-folder me-2"></i> <?= $menu['nom_menu'] ?>
                                 </li>
                                 <div class="d-none" id="edit_menu_<?= $menu['id'] ?>">
-                                    <?php if(!empty($menu['sous_menus'])): ?>
-                                        <?php foreach($menu['sous_menus'] as $sm): ?>
+                                    <?php if (!empty($menu['sous_menus'])): ?>
+                                        <?php foreach ($menu['sous_menus'] as $sm): ?>
                                             <div class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
                                                 <?= $sm['nom_sous_menu'] ?>
                                             </div>
@@ -201,10 +235,10 @@
         </div>
     </div>
 </div>
+<?php endif; ?>
 <!-- ================= SCRIPT MODAL EDIT & ADD ================= -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-
     // ================== GLOBAL ==================
    const GLOBAL_MENU_IDS = ['6'];
 
@@ -415,7 +449,7 @@ selectedPermissions = selectedPermissions.filter(p => p !== val);
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Oui, supprimer',
+                confirmButtonText: 'Oui, supprimer', 
                 cancelButtonText: 'Annuler'
             }).then(result => {
                 if(result.isConfirmed){
@@ -438,8 +472,6 @@ selectedPermissions = selectedPermissions.filter(p => p !== val);
 
 });
 
-
- 
 
 
 
@@ -486,9 +518,7 @@ Swal.fire("Erreur",data.message,"error");
 
 
 
-
 // ================= SWEET ALERT ADD =================
-
 const addForm = document.querySelector("#addProfil form");
 
 if(addForm){
@@ -496,6 +526,7 @@ if(addForm){
 addForm.addEventListener("submit", function(e){
 
 e.preventDefault();
+
 
 let formData = new FormData(this);
 

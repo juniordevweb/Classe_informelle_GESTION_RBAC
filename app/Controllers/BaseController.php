@@ -49,15 +49,25 @@ abstract class BaseController extends Controller
 
     protected function getUserPermissions()
     {
+        $sessionPermissions = session()->get('user_permissions');
+
+        if (is_array($sessionPermissions)) {
+            return $sessionPermissions;
+        }
+
         $role_id = session()->get('role_id');
 
         if (!$role_id) {
             return [];
         }
 
-        return $this->rolePermissionModel
+        $permissions = $this->rolePermissionModel
             ->where('role_id', $role_id)
             ->findAll();
+
+        session()->set('user_permissions', $permissions);
+
+        return $permissions;
     }
 
 }
