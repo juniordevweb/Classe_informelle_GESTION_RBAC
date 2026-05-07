@@ -29,6 +29,10 @@ class C_SuperviseurController extends BaseController
     {
         $this->ensureSuperviseurTable();
 
+        $login = $this->resolveLoginFromRequest();
+
+        $this->request->setGlobal('post', array_merge($this->request->getPost(), ['login' => $login]));
+
         if (! $this->validate($this->getValidationRules(true))) {
             return redirect()->to('/superviseur')
                 ->withInput()
@@ -60,7 +64,9 @@ class C_SuperviseurController extends BaseController
         }
 
         $matricule = trim((string) $this->request->getPost('matricule'));
-        $login = trim((string) $this->request->getPost('login'));
+        $login = $this->resolveLoginFromRequest($superviseur);
+
+        $this->request->setGlobal('post', array_merge($this->request->getPost(), ['login' => $login]));
 
         $existingMatricule = $this->superviseurModel
             ->where('matricule', $matricule)
@@ -143,6 +149,7 @@ class C_SuperviseurController extends BaseController
     protected function buildSuperviseurPayload(bool $isCreate, array $existing = []): array
     {
         $password = trim((string) $this->request->getPost('password'));
+        $login = $this->resolveLoginFromRequest($existing);
 
         $payload = [
             'matricule' => trim((string) $this->request->getPost('matricule')),
@@ -156,7 +163,7 @@ class C_SuperviseurController extends BaseController
             'region' => trim((string) $this->request->getPost('region')),
             'departement' => trim((string) $this->request->getPost('departement')),
             'date_affectation' => $this->request->getPost('date_affectation'),
-            'login' => trim((string) $this->request->getPost('login')),
+            'login' => $login,
             'statut' => $this->request->getPost('statut'),
         ];
 
@@ -167,6 +174,23 @@ class C_SuperviseurController extends BaseController
         }
 
         return $payload;
+    }
+
+    protected function resolveLoginFromRequest(array $existing = []): string
+    {
+        $login = trim((string) $this->request->getPost('login'));
+
+        if ($login !== '') {
+            return $login;
+        }
+
+        $matricule = trim((string) $this->request->getPost('matricule'));
+
+        if ($matricule !== '') {
+            return $matricule;
+        }
+
+        return (string) ($existing['login'] ?? '');
     }
 
     protected function ensureSuperviseurTable(): void

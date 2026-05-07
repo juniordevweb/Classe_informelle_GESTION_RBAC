@@ -154,6 +154,24 @@ $showParam = hasPermission($user_permissions, 6, 6, 1);
                         </li>
                     <?php endif; ?>
 
+                    <?php if (hasPermission($user_permissions, 5, 13, 1)): ?>
+                        <li class="<?= (uri_string() == 'apprenant') ? 'active' : '' ?>">
+                            <a href="<?= base_url('apprenant') ?>" class="waves-effect">
+                                <i class="md md-school"></i>
+                                <span>Apprenant</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (hasPermission($user_permissions, 7, 14, 1)): ?>
+                        <li class="<?= (uri_string() == 'classes') ? 'active' : '' ?>">
+                            <a href="<?= base_url('classes') ?>" class="waves-effect">
+                                <i class="md md-business"></i>
+                                <span>Classes</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
                     <?php if ($showParam): ?>
                         <li
                             class="has_sub <?= (in_array(uri_string(), ['users', 'profils', 'tables-editable'])) ? 'active' : '' ?>">

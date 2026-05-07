@@ -21,8 +21,8 @@ class C_FacilitateurController extends BaseController
 
         $data['user_permissions'] = $this->getUserPermissions();
         $data['facilitateurs'] = $this->facilitateurModel->orderBy('id', 'DESC')->findAll();
-        $data['structures'] = $this->getReferenceOptions('structure');
-        $data['classes'] = $this->getReferenceOptions('classe');
+        $data['structures'] = $this->getReferenceOptions('structures');
+        $data['classes'] = $this->getReferenceOptions('classes');
 
         return view('V_GestionFacilitateur', $data);
     }
@@ -55,8 +55,8 @@ class C_FacilitateurController extends BaseController
                 ->with('error', implode(' ', $this->validator->getErrors()));
         }
 
-        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structure');
-        $classeId = $this->normalizeOptionalForeignKey($this->request->getPost('classe_id'), 'classe');
+        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structures');
+        $classeId = $this->normalizeOptionalForeignKey($this->request->getPost('classe_id'), 'classes');
 
         $data = [
             'matricule' => trim((string) $this->request->getPost('matricule')),
@@ -335,8 +335,8 @@ class C_FacilitateurController extends BaseController
 
     protected function buildFacilitateurPayload(): array
     {
-        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structure');
-        $classeId = $this->normalizeOptionalForeignKey($this->request->getPost('classe_id'), 'classe');
+        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structures');
+        $classeId = $this->normalizeOptionalForeignKey($this->request->getPost('classe_id'), 'classes');
 
         return [
             'matricule' => trim((string) $this->request->getPost('matricule')),

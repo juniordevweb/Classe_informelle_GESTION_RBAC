@@ -142,7 +142,6 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                                 <th>Email</th>
                                 <th>Fonction</th>
                                 <th>Affectation</th>
-                                <th>Login</th>
                                 <th>Statut</th>
                                 <?php if ($showSuperviseurActionsColumn): ?>
                                     <th class="text-center" width="140">Actions</th>
@@ -166,7 +165,6 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                                                 <?= esc($superviseur['date_affectation']) ?>
                                             </small>
                                         </td>
-                                        <td><?= esc($superviseur['login']) ?></td>
                                         <td>
                                             <span class="badge <?= ($superviseur['statut'] ?? 'actif') === 'actif' ? 'text-bg-success' : 'text-bg-secondary' ?>">
                                                 <?= esc($superviseur['statut'] ?? 'actif') ?>
@@ -188,7 +186,6 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                                                         data-region="<?= esc($superviseur['region'], 'attr') ?>"
                                                         data-departement="<?= esc($superviseur['departement'], 'attr') ?>"
                                                         data-date-affectation="<?= esc($superviseur['date_affectation'], 'attr') ?>"
-                                                        data-login="<?= esc($superviseur['login'], 'attr') ?>"
                                                         data-statut="<?= esc($superviseur['statut'], 'attr') ?>">
                                                         <i class="fa fa-edit"></i>
                                                     </button>
@@ -206,7 +203,7 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="<?= $showSuperviseurActionsColumn ? '10' : '9' ?>" class="text-center text-muted py-4">Aucun superviseur enregistre.</td>
+                                    <td colspan="<?= $showSuperviseurActionsColumn ? '9' : '8' ?>" class="text-center text-muted py-4">Aucun superviseur enregistre.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -282,13 +279,12 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                     <div class="card section-card border-0">
                         <div class="card-header">
                             <h6 class="section-title">Acces et statut</h6>
-                            <p class="section-description">Configurez le login et l'etat du compte superviseur.</p>
+                            <p class="section-description">Configurez l'acces et l'etat du compte superviseur.</p>
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
-                                <div class="col-md-4"><label class="form-label">Login</label><input type="text" name="login" class="form-control" value="<?= esc(old('login')) ?>" required></div>
-                                <div class="col-md-4"><label class="form-label">Mot de passe</label><input type="password" name="password" class="form-control" required></div>
-                                <div class="col-md-4">
+                                <div class="col-md-6"><label class="form-label">Mot de passe</label><input type="password" name="password" class="form-control" required></div>
+                                <div class="col-md-6">
                                     <label class="form-label">Statut</label>
                                     <select name="statut" class="form-select" required>
                                         <option value="actif" <?= old('statut', 'actif') === 'actif' ? 'selected' : '' ?>>Actif</option>
@@ -380,9 +376,8 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                         </div>
                         <div class="card-body">
                             <div class="row g-3">
-                                <div class="col-md-4"><label class="form-label">Login</label><input type="text" name="login" id="edit_login" class="form-control" required></div>
-                                <div class="col-md-4"><label class="form-label">Nouveau mot de passe</label><input type="password" name="password" id="edit_password" class="form-control" placeholder="Laisser vide pour conserver"></div>
-                                <div class="col-md-4">
+                                <div class="col-md-6"><label class="form-label">Nouveau mot de passe</label><input type="password" name="password" id="edit_password" class="form-control" placeholder="Laisser vide pour conserver"></div>
+                                <div class="col-md-6">
                                     <label class="form-label">Statut</label>
                                     <select name="statut" id="edit_statut" class="form-select" required>
                                         <option value="actif">Actif</option>
@@ -438,7 +433,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('edit_region').value = this.dataset.region || '';
                 document.getElementById('edit_departement').value = this.dataset.departement || '';
                 document.getElementById('edit_date_affectation').value = this.dataset.dateAffectation || '';
-                document.getElementById('edit_login').value = this.dataset.login || '';
                 document.getElementById('edit_password').value = '';
                 document.getElementById('edit_statut').value = this.dataset.statut || 'actif';
                 new bootstrap.Modal(document.getElementById('editSuperviseurModal')).show();
