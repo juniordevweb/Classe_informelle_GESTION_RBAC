@@ -18,9 +18,11 @@ class C_FacilitateurController extends BaseController
     public function index()
     {
         $this->ensureFacilitateurTable();
+        $perPage = 3;
 
         $data['user_permissions'] = $this->getUserPermissions();
-        $data['facilitateurs'] = $this->facilitateurModel->orderBy('id', 'DESC')->findAll();
+        $data['facilitateurs'] = $this->facilitateurModel->orderBy('id', 'DESC')->paginate($perPage, 'facilitateurs');
+        $data['pager'] = $this->facilitateurModel->pager;
         $data['structures'] = $this->getReferenceOptions('structures');
         $data['classes'] = $this->getReferenceOptions('classes');
 

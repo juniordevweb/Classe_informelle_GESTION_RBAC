@@ -36,6 +36,7 @@ $simpleMenuPermissions = [
     'facilitateur' => ['menu_id' => 2, 'sous_menu_id' => 2],
     'superviseur' => ['menu_id' => 3, 'sous_menu_id' => 3],
     'operateur' => ['menu_id' => 4, 'sous_menu_id' => 4],
+    'structures' => ['menu_id' => 8, 'sous_menu_id' => 15],
 ];
 
 $showParam = hasPermission($user_permissions, 6, 6, 1);
@@ -168,6 +169,15 @@ $showParam = hasPermission($user_permissions, 6, 6, 1);
                             <a href="<?= base_url('classes') ?>" class="waves-effect">
                                 <i class="md md-business"></i>
                                 <span>Classes</span>
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['structures']['menu_id'], $simpleMenuPermissions['structures']['sous_menu_id'], 1)): ?>
+                        <li class="<?= (uri_string() == 'structures') ? 'active' : '' ?>">
+                            <a href="<?= base_url('structures') ?>" class="waves-effect">
+                                <i class="md md-business"></i>
+                                <span>Structures</span>
                             </a>
                         </li>
                     <?php endif; ?>

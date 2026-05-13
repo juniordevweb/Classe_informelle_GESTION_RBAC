@@ -19,17 +19,17 @@
             <div class="row">
                 <div class="col-md-6 col-xl-3">
                     <div class="mini-stat clearfix bx-shadow bg-white">
-                        <span class="mini-stat-icon bg-info"><i class="ion-social-usd"></i></span>
+                        <span class="mini-stat-icon bg-info"><i class="fa fa-list"></i></span>
                         <div class="mini-stat-info text-right text-dark">
-                            <span class="counter text-dark">15852</span>
-                            Total Sales
+                            <span class="counter text-dark"><?= esc($totalStructures ?? 0) ?></span>
+                            Total Structures
                         </div>
                         <div class="tiles-progress">
                             <div class="m-t-20">
-                                <h5 class="text-uppercase">Target <span class="pull-right">60%</span></h5>
+                                <h5 class="text-uppercase">Suivi global <span class="pull-right">100%</span></h5>
                                 <div class="progress progress-sm m-0">
-                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                        <span class="sr-only">60% Complete</span>
+                                    <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                        <span class="sr-only">100% Complete</span>
                                     </div>
                                 </div>
                             </div>
@@ -39,17 +39,17 @@
 
                 <div class="col-md-6 col-xl-3">
                     <div class="mini-stat clearfix bx-shadow bg-white">
-                        <span class="mini-stat-icon bg-purple"><i class="ion-ios7-cart"></i></span>
+                        <span class="mini-stat-icon bg-success"><i class="fa fa-check-circle"></i></span>
                         <div class="mini-stat-info text-right text-dark">
-                            <span class="counter text-dark">956</span>
-                            New Orders
+                            <span class="counter text-dark"><?= esc($structuresOuvertes ?? 0) ?></span>
+                            Structures Ouvertes
                         </div>
                         <div class="tiles-progress">
                             <div class="m-t-20">
-                                <h5 class="text-uppercase">Target <span class="pull-right">90%</span></h5>
+                                <h5 class="text-uppercase">Etat actif <span class="pull-right"><?= esc($totalStructures ?? 0) > 0 ? round((($structuresOuvertes ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%</span></h5>
                                 <div class="progress progress-sm m-0">
-                                    <div class="progress-bar progress-bar-purple" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" style="width: 90%">
-                                        <span class="sr-only">90% Complete</span>
+                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= esc($totalStructures ?? 0) > 0 ? round((($structuresOuvertes ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= esc($totalStructures ?? 0) > 0 ? round((($structuresOuvertes ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%">
+                                        <span class="sr-only">Progression</span>
                                     </div>
                                 </div>
                             </div>
@@ -59,17 +59,17 @@
 
                 <div class="col-md-6 col-xl-3">
                     <div class="mini-stat clearfix bx-shadow bg-white">
-                        <span class="mini-stat-icon bg-success"><i class="ion-android-contacts"></i></span>
+                        <span class="mini-stat-icon bg-danger"><i class="fa fa-times-circle"></i></span>
                         <div class="mini-stat-info text-right text-dark">
-                            <span class="counter text-dark">5210</span>
-                            New Users
+                            <span class="counter text-dark"><?= esc($structuresFermees ?? 0) ?></span>
+                            Structures Fermees
                         </div>
                         <div class="tiles-progress">
                             <div class="m-t-20">
-                                <h5 class="text-uppercase">Target <span class="pull-right">57%</span></h5>
+                                <h5 class="text-uppercase">Etat ferme <span class="pull-right"><?= esc($totalStructures ?? 0) > 0 ? round((($structuresFermees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%</span></h5>
                                 <div class="progress progress-sm m-0">
-                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="57" aria-valuemin="0" aria-valuemax="100" style="width: 57%">
-                                        <span class="sr-only">57% Complete</span>
+                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="<?= esc($totalStructures ?? 0) > 0 ? round((($structuresFermees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= esc($totalStructures ?? 0) > 0 ? round((($structuresFermees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%">
+                                        <span class="sr-only">Progression</span>
                                     </div>
                                 </div>
                             </div>
@@ -79,17 +79,17 @@
 
                 <div class="col-md-6 col-xl-3">
                     <div class="mini-stat clearfix bx-shadow bg-white">
-                        <span class="mini-stat-icon bg-primary"><i class="ion-eye"></i></span>
+                        <span class="mini-stat-icon bg-primary"><i class="fa fa-check"></i></span>
                         <div class="mini-stat-info text-right text-dark">
-                            <span class="counter text-dark">20544</span>
-                            Unique Visitors
+                            <span class="counter text-dark"><?= esc($structuresValidees ?? 0) ?></span>
+                            Structures Validees
                         </div>
                         <div class="tiles-progress">
                             <div class="m-t-20">
-                                <h5 class="text-uppercase">Target <span class="pull-right">60%</span></h5>
+                                <h5 class="text-uppercase">Etat valide <span class="pull-right"><?= esc($totalStructures ?? 0) > 0 ? round((($structuresValidees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%</span></h5>
                                 <div class="progress progress-sm m-0">
-                                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                        <span class="sr-only">60% Complete</span>
+                                    <div class="progress-bar progress-bar-primary" role="progressbar" aria-valuenow="<?= esc($totalStructures ?? 0) > 0 ? round((($structuresValidees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= esc($totalStructures ?? 0) > 0 ? round((($structuresValidees ?? 0) / ($totalStructures ?? 1)) * 100) : 0 ?>%">
+                                        <span class="sr-only">Progression</span>
                                     </div>
                                 </div>
                             </div>

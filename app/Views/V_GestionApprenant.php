@@ -154,6 +154,9 @@ function getPerformanceBadgeClass(string $decision): string
                         </tbody>
                     </table>
                 </div>
+                <div class="d-flex justify-content-center mt-4">
+                    <?= isset($pager) ? $pager->simpleLinks('apprenants', 'prev_next') : '' ?>
+                </div>
             </div>
         </div>
     </div>

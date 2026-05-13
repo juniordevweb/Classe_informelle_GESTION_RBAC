@@ -63,4 +63,6 @@ class C_AuthController extends BaseController
 
         return redirect()->to('/login');
     }
+
 }
+

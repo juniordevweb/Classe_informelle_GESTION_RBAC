@@ -20,6 +20,7 @@ class C_ApprenantController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
+        $perPage = 3;
         $selectedClassId = (int) $this->request->getGet('classe_id');
         $data['open_add_modal'] = $this->request->getGet('open_modal') === '1';
         $selectedClassName = null;
@@ -29,16 +30,15 @@ class C_ApprenantController extends BaseController
             $selectedClassName = $classe ? $classe['nom_classe'] : null;
         }
 
-        $apprenants = $this->apprenantModel->orderBy('nom', 'ASC')->orderBy('prenom', 'ASC')->findAll();
+        $query = $this->apprenantModel->orderBy('nom', 'ASC')->orderBy('prenom', 'ASC');
 
         if ($selectedClassName) {
-            $apprenants = array_filter($apprenants, static function (array $apprenant) use ($selectedClassName): bool {
-                return trim((string) ($apprenant['derniere_classe'] ?? '')) === trim((string) $selectedClassName);
-            });
+            $query = $query->where('derniere_classe', $selectedClassName);
         }
 
         $data['classes'] = $this->getClasseOptions();
-        $data['apprenants'] = array_values($apprenants);
+        $data['apprenants'] = $query->paginate($perPage, 'apprenants');
+        $data['pager'] = $this->apprenantModel->pager;
         $data['performances'] = $this->buildPerformanceData($data['apprenants'], $this->getApprenantNotes());
         $data['selected_class'] = $selectedClassName;
         $data['selected_class_id'] = $selectedClassId;

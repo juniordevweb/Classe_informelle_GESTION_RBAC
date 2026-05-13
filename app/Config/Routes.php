@@ -49,6 +49,16 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('classes/update', 'C_ClasseController::update', ['filter' => 'permission:7,14,3']);
     $routes->get('classes/delete/(:num)', 'C_ClasseController::delete/$1', ['filter' => 'permission:7,14,4']);
 
+    // Structures
+    $routes->get('structures', 'C_StructureController::index', ['filter' => 'auth']);
+    $routes->get('structures/create', 'C_StructureController::create', ['filter' => 'auth']);
+    $routes->post('structures/store', 'C_StructureController::store', ['filter' => 'auth']);
+    $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'auth']);
+    $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'auth']);
+    $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'auth']);
+    $routes->get('structures/delete/(:num)', 'C_StructureController::destroy/$1', ['filter' => 'auth']);
+    $routes->get('structures/api/get/(:num)', 'C_StructureController::apiGet/$1', ['filter' => 'auth']);
+
     // Users
     $routes->get('users', 'C_UserController::index', ['filter' => 'permission:6,6,1']);
     $routes->post('users/save_user', 'C_UserController::save_user', ['filter' => 'permission:6,6,2']);
