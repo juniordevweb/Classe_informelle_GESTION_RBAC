@@ -66,6 +66,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('users/delete/(:num)', 'C_UserController::delete/$1', ['filter' => 'permission:6,6,4']);
     $routes->post('users/update', 'C_UserController::update', ['filter' => 'permission:6,6,3']);
 
+
+
+// ================= API RECHERCHE PERSONNEL =================
+
+$routes->get('users/search-personnel', 'C_UserController::search_personnel');
+
     // Profils
     $routes->get('profils', 'C_ProfilController::index', ['filter' => 'permission:6,6,1']);
     $routes->get('profils/get/(:num)', 'C_ProfilController::getProfil/$1', ['filter' => 'permission:6,6,1']);

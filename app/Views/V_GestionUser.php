@@ -1,6 +1,7 @@
 <?= $this->include('templates/header') ?>
 <?= $this->include('templates/top_bar') ?>
 <?= $this->include('templates/left_sidebar') ?>
+
 <?php
 $user_permissions = $user_permissions ?? [];
 
@@ -25,18 +26,75 @@ $hasUserActionPermission = static function (array $permissions, int $menuId, int
 $canAddUser = $hasUserActionPermission($user_permissions, 6, 6, 2);
 $canEditUser = $hasUserActionPermission($user_permissions, 6, 6, 3);
 $canDeleteUser = $hasUserActionPermission($user_permissions, 6, 6, 4);
+
 $showUserActionsColumn = $canEditUser || $canDeleteUser;
 ?>
+
+<style>
+    #addUserModal .modal-dialog {
+        max-width: 900px;
+    }
+
+    #addUserModal .modal-content {
+        max-height: calc(100vh - 2rem);
+        padding: 0;
+    }
+
+    #addUserModal form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        max-height: calc(100vh - 2rem);
+    }
+
+    #addUserModal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 1.25rem !important;
+    }
+
+    #addUserModal .modal-footer {
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        #addUserModal .modal-dialog {
+            max-width: calc(100vw - 1rem);
+            margin: 0.5rem auto;
+        }
+
+        #addUserModal .modal-body,
+        #addUserModal .modal-header,
+        #addUserModal .modal-footer {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+        }
+
+        #addUserModal .modal-footer {
+            gap: 0.75rem;
+        }
+
+        #addUserModal .modal-footer .btn {
+            width: 100%;
+        }
+    }
+</style>
+
 <br>
 
 <div class="content-page">
     <div class="container mt-4">
+
         <br><br><br>
 
         <div class="d-flex justify-content-between mb-4">
             <h3>Gestion des Utilisateurs</h3>
+
             <?php if ($canAddUser): ?>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <button class="btn btn-primary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addUserModal">
                     Ajouter Utilisateur
                 </button>
             <?php endif; ?>
@@ -48,256 +106,728 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                     <th>Nom</th>
                     <th>Email</th>
                     <th>Profil</th>
+
                     <?php if ($showUserActionsColumn): ?>
                         <th width="150">Action</th>
                     <?php endif; ?>
                 </tr>
             </thead>
+
             <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr>
-                        <td><?= $user['nom'] ?></td>
-                        <td><?= $user['email'] ?></td>
+                        <td><?= esc($user['nom']) ?></td>
+                        <td><?= esc($user['email']) ?></td>
+
                         <td>
                             <?php
-                            $role = array_filter($profils, fn ($p) => $p['id'] == $user['role_id']);
-                    echo $role ? array_values($role)[0]['nom_role'] : '';
-                    ?>
+                            $role = array_filter(
+                                $profils,
+                                fn ($p) => $p['id'] == $user['role_id']
+                            );
+
+                            echo $role ? esc(array_values($role)[0]['nom_role']) : '';
+                            ?>
                         </td>
+
                         <?php if ($showUserActionsColumn): ?>
                             <td class="text-center">
+
                                 <?php if ($canEditUser): ?>
-                                    <button class="btn btn-warning btn-sm blockBtn" data-id="<?= $user['id'] ?>" data-nom="<?= $user['nom'] ?>" title="Bloquer">
+                                    <button class="btn btn-warning btn-sm blockBtn"
+                                            data-id="<?= esc($user['id']) ?>"
+                                            data-nom="<?= esc($user['nom']) ?>"
+                                            title="Bloquer">
                                         <i class="fa fa-user"></i>
                                     </button>
                                 <?php endif; ?>
 
                                 <?php if ($canEditUser): ?>
                                     <button class="btn btn-info btn-sm editBtn"
-                                        data-id="<?= $user['id'] ?>"
-                                        data-nom="<?= $user['nom'] ?>"
-                                        data-email="<?= $user['email'] ?>"
-                                        data-role="<?= $user['role_id'] ?>"
-                                        title="Modifier">
+                                            data-id="<?= esc($user['id']) ?>"
+                                            data-nom="<?= esc($user['nom']) ?>"
+                                            data-email="<?= esc($user['email']) ?>"
+                                            data-role="<?= esc($user['role_id']) ?>"
+                                            title="Modifier">
                                         <i class="fa fa-edit"></i>
                                     </button>
                                 <?php endif; ?>
 
                                 <?php if ($canDeleteUser): ?>
-                                    <button class="btn btn-danger btn-sm deleteBtn" data-id="<?= $user['id'] ?>" data-nom="<?= $user['nom'] ?>" title="Supprimer">
+                                    <button class="btn btn-danger btn-sm deleteBtn"
+                                            data-id="<?= esc($user['id']) ?>"
+                                            data-nom="<?= esc($user['nom']) ?>"
+                                            title="Supprimer">
                                         <i class="fa fa-trash"></i>
                                     </button>
                                 <?php endif; ?>
+
                             </td>
                         <?php endif; ?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+
     </div>
 </div>
 
+
+<!-- ================= ADD USER MODAL ================= -->
+
 <?php if ($canAddUser): ?>
-<div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content shadow-lg rounded-4">
-            <form method="post" action="<?= base_url('users/save_user') ?>">
-                <div class="modal-header bg-gradient-primary text-white border-0 rounded-top">
-                    <h5 class="modal-title">
-                        <i class="fa fa-user-plus me-2"></i> Ajouter Utilisateur
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+<div class="modal fade"
+     id="addUserModal"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <form method="post"
+                  action="<?= base_url('users/save_user') ?>">
+
+                <?= csrf_field() ?>
+
+                <!-- HEADER -->
+                <div class="modal-header border-0 px-4 py-3"
+                     style="background: linear-gradient(135deg,#0d6efd,#0b5ed7);">
+
+                    <div>
+                        <h4 class="modal-title text-white fw-bold mb-1">
+                            <i class="fa-solid fa-user-plus me-2"></i>
+                            Ajouter un utilisateur
+                        </h4>
+
+                        <small class="text-white-50">
+                            Création d’un nouveau compte utilisateur
+                        </small>
+                    </div>
+
+                    <button type="button"
+                            class="btn-close btn-close-white shadow-none"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
-                <div class="modal-body p-4">
-                    <div class="mb-3 form-floating">
-                        <input type="text" name="nom" class="form-control" id="userNom" placeholder="Nom" required>
-                        <label for="userNom"><i class="fa fa-user me-2"></i>Nom</label>
+                <div class="modal-body bg-light p-4">
+
+                    <div class="row g-4">
+
+                        <!-- LEFT -->
+                        <div class="col-lg-5">
+
+                            <!-- RECHERCHE -->
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+
+                                <div class="card-body p-4">
+
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width:50px;height:50px;">
+                                            <i class="fa-solid fa-magnifying-glass fs-5"></i>
+                                        </div>
+
+                                        <div class="ms-3">
+                                            <h5 class="fw-bold mb-0">
+                                                Recherche utilisateur
+                                            </h5>
+
+                                            <small class="text-muted">
+                                                INE ou email professionnel
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold">
+                                            INE / Email
+                                        </label>
+
+                                        <div class="input-group input-group-lg">
+
+                                            <span class="input-group-text bg-white border-end-0">
+                                                <i class="fa fa-search text-muted"></i>
+                                            </span>
+
+                                            <input type="text"
+                                                   id="searchUser"
+                                                   class="form-control border-start-0 shadow-none"
+                                                   placeholder="Ex: 64G17Y12">
+
+                                        </div>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn btn-primary btn-lg w-100 rounded-3"
+                                            id="btnSearchUser">
+
+                                        <i class="fa fa-search me-2"></i>
+                                        Rechercher l'utilisateur
+                                    </button>
+
+                                    <div class="alert alert-light border mt-4 mb-0 rounded-3">
+                                        <small class="text-muted">
+                                            <i class="fa fa-circle-info me-1"></i>
+                                            Les informations seront remplies automatiquement après la recherche.
+                                        </small>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+                        <div class="col-lg-7">
+
+                            <div class="card border-0 shadow-sm rounded-4">
+
+                                <div class="card-body p-4">
+
+                                    <!-- TITLE -->
+                                    <div class="d-flex align-items-center mb-4">
+
+                                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width:50px;height:50px;">
+                                            <i class="fa-solid fa-id-badge fs-5"></i>
+                                        </div>
+
+                                        <div class="ms-3">
+                                            <h5 class="fw-bold mb-0">
+                                                Informations utilisateur
+                                            </h5>
+
+                                            <small class="text-muted">
+                                                Données du compte
+                                            </small>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- INFOS -->
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Nom
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fa fa-user text-primary"></i>
+                                                </span>
+
+                                                <input type="text"
+                                                       name="nom"
+                                                       class="form-control"
+                                                       id="userNom"
+                                                       placeholder="Nom"
+                                                       readonly
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Prénom
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fa fa-user text-primary"></i>
+                                                </span>
+
+                                                <input type="text"
+                                                       name="prenom"
+                                                       class="form-control"
+                                                       id="userPrenom"
+                                                       placeholder="Prénom"
+                                                       readonly
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                INE
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fa fa-id-card text-primary"></i>
+                                                </span>
+
+                                                <input type="text"
+                                                       name="ine"
+                                                       class="form-control"
+                                                       id="userIne"
+                                                       placeholder="INE"
+                                                       readonly
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-semibold">
+                                                Email professionnel
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <span class="input-group-text bg-white">
+                                                    <i class="fa fa-envelope text-primary"></i>
+                                                </span>
+
+                                                <input type="email"
+                                                       name="email"
+                                                       class="form-control"
+                                                       id="userEmail"
+                                                       placeholder="Mail professionnel"
+                                                       readonly
+                                                       required>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- ROLE -->
+                                    <div class="mb-3">
+
+                                        <label class="form-label fw-semibold">
+                                            Profil utilisateur
+                                        </label>
+
+                                        <div class="input-group">
+
+                                            <span class="input-group-text bg-white">
+                                                <i class="fa fa-shield-alt text-primary"></i>
+                                            </span>
+
+                                            <select name="role_id"
+                                                    class="form-select"
+                                                    id="userRole"
+                                                    required>
+
+                                                <option value="">
+                                                    Sélectionner un profil
+                                                </option>
+
+                                                <?php foreach ($profils as $p): ?>
+                                                    <option value="<?= esc($p['id']) ?>">
+                                                        <?= esc($p['nom_role']) ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- PASSWORD -->
+                                    <div class="mb-2">
+
+                                        <label class="form-label fw-semibold">
+                                            Mot de passe généré
+                                        </label>
+
+                                        <div class="input-group">
+
+                                            <span class="input-group-text bg-white">
+                                                <i class="fa fa-lock text-primary"></i>
+                                            </span>
+
+                                            <input type="text"
+                                                   name="password"
+                                                   class="form-control"
+                                                   id="userPassword"
+                                                   readonly
+                                                   required>
+
+                                            <button type="button"
+                                                    class="btn btn-outline-primary"
+                                                    id="generatePassword">
+
+                                                <i class="fa fa-rotate me-1"></i>
+                                                Régénérer
+                                            </button>
+
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Un mot de passe sécurisé est généré automatiquement.
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="mb-3 form-floating">
-                        <input type="email" name="email" class="form-control" id="userEmail" placeholder="Email" required>
-                        <label for="userEmail"><i class="fa fa-envelope me-2"></i>Email</label>
-                    </div>
-
-                    <div class="mb-3 form-floating">
-                        <select name="role_id" class="form-select" id="userRole" required>
-                            <option value="">Selectionner un profil</option>
-                            <?php foreach ($profils as $p): ?>
-                                <option value="<?= $p['id'] ?>"><?= $p['nom_role'] ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                        <label for="userRole"><i class="fa fa-shield-alt me-2"></i>Profil</label>
-                    </div>
-
-                    <div class="mb-3 form-floating">
-                        <input type="text" name="password" class="form-control" id="userPassword" placeholder="Mot de passe" readonly>
-                        <label for="userPassword"><i class="fa fa-lock me-2"></i>Mot de passe</label>
-                    </div>
                 </div>
 
-                <div class="modal-footer border-0 justify-content-between p-3">
-                    <button type="button" class="btn btn-outline-secondary btn-lg" data-bs-dismiss="modal">
-                        <i class="fa fa-times me-1"></i> Annuler
+                <!-- FOOTER -->
+                <div class="modal-footer border-0 bg-white px-4 py-3">
+
+                    <button type="button"
+                            class="btn btn-light border rounded-3 px-4"
+                            data-bs-dismiss="modal">
+
+                        <i class="fa fa-times me-1"></i>
+                        Annuler
                     </button>
-                    <button type="submit" class="btn btn-success btn-lg">
-                        <i class="fa fa-check me-1"></i> Enregistrer
+
+                    <button type="submit"
+                            class="btn btn-success rounded-3 px-4 shadow-sm"
+                            id="btnSaveUser"
+                            disabled>
+
+                        <i class="fa fa-save me-1"></i>
+                        Enregistrer l'utilisateur
                     </button>
+
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>
+
 <?php endif; ?>
 
-<?php if ($canAddUser): ?>
-<script>
-    document.getElementById('addUserModal').addEventListener('show.bs.modal', function () {
-        const passwordField = document.getElementById('userPassword');
-        const randomPassword = Math.random().toString(36).slice(-8);
-        passwordField.value = randomPassword;
-    });
-</script>
-<?php endif; ?>
+
+<!-- ================= EDIT USER MODAL ================= -->
 
 <?php if ($canEditUser): ?>
+
 <div class="modal fade" id="editUserModal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form method="post" action="<?= base_url('users/update') ?>">
+
+            <form method="post"
+                  action="<?= base_url('users/update') ?>">
+
+                <?= csrf_field() ?>
+
                 <div class="modal-header bg-info text-white">
                     <h5>Modifier Utilisateur</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    <input type="hidden" name="id" id="edit_id">
-                    <input type="text" name="nom" id="edit_nom" class="form-control mb-3" placeholder="Nom" required>
-                    <input type="email" name="email" id="edit_email" class="form-control mb-3" placeholder="Email" required>
 
-                    <select name="role_id" id="edit_role" class="form-select mb-3" required>
+                    <input type="hidden"
+                           name="id"
+                           id="edit_id">
+
+                    <input type="text"
+                           name="nom"
+                           id="edit_nom"
+                           class="form-control mb-3"
+                           placeholder="Nom"
+                           required>
+
+                    <input type="email"
+                           name="email"
+                           id="edit_email"
+                           class="form-control mb-3"
+                           placeholder="Email"
+                           required>
+
+                    <select name="role_id"
+                            id="edit_role"
+                            class="form-select mb-3"
+                            required>
+
                         <?php foreach ($profils as $p): ?>
-                            <option value="<?= $p['id'] ?>">
-                                <?= $p['nom_role'] ?>
+                            <option value="<?= esc($p['id']) ?>">
+                                <?= esc($p['nom_role']) ?>
                             </option>
                         <?php endforeach; ?>
+
                     </select>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
                         Annuler
                     </button>
-                    <button type="submit" class="btn btn-info">
-                        Mettre Ã  jour
+
+                    <button type="submit"
+                            class="btn btn-info">
+                        Mettre à jour
                     </button>
                 </div>
+
             </form>
+
         </div>
     </div>
 </div>
+
 <?php endif; ?>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        <?php if (session()->getFlashdata('success')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'SuccÃ¨s !',
-                html: "<?= session()->getFlashdata('success') ?>",
-                confirmButtonColor: '#3085d6',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: true
-            });
-        <?php endif; ?>
 
-        <?php if (session()->getFlashdata('error')): ?>
+<script>
+
+// ================= GENERATE PASSWORD =================
+
+function genererPassword(length = 12) {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%";
+    let password = "";
+
+    for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    return password;
+}
+
+
+// ================= RESET ADD USER FORM =================
+
+function resetAddUserForm() {
+    const fields = [
+        'searchUser',
+        'userNom',
+        'userPrenom',
+        'userIne',
+        'userEmail'
+    ];
+
+    fields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = '';
+        }
+    });
+
+    const role = document.getElementById('userRole');
+    if (role) {
+        role.value = '';
+    }
+
+    const password = document.getElementById('userPassword');
+    if (password) {
+        password.value = genererPassword();
+    }
+
+    const btnSave = document.getElementById('btnSaveUser');
+    if (btnSave) {
+        btnSave.disabled = true;
+    }
+}
+
+
+// ================= OPEN ADD MODAL =================
+
+const addModal = document.getElementById('addUserModal');
+
+if (addModal) {
+    addModal.addEventListener('show.bs.modal', function () {
+        resetAddUserForm();
+    });
+}
+
+
+// ================= BTN GENERATE PASSWORD =================
+
+const generateBtn = document.getElementById('generatePassword');
+
+if (generateBtn) {
+    generateBtn.addEventListener('click', function () {
+        document.getElementById('userPassword').value = genererPassword();
+    });
+}
+
+
+// ================= SEARCH USER API =================
+
+const btnSearchUser = document.getElementById('btnSearchUser');
+
+if (btnSearchUser) {
+    btnSearchUser.addEventListener('click', async function () {
+
+        const searchInput = document.getElementById('searchUser');
+        const search = searchInput.value.trim();
+
+        if (search === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Attention',
+                text: 'Veuillez saisir un INE ou un mail professionnel.'
+            });
+
+            return;
+        }
+
+        btnSearchUser.disabled = true;
+        btnSearchUser.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Recherche...';
+
+        try {
+          const response = await fetch(
+    `<?= base_url('users/search-personnel') ?>?q=${encodeURIComponent(search)}`
+);
+
+            const data = await response.json();
+
+            if (data.status === 'success' && data.user) {
+
+                document.getElementById('userNom').value = data.user.nom ?? '';
+                document.getElementById('userPrenom').value = data.user.prenom ?? '';
+                document.getElementById('userIne').value = data.user.ine ?? '';
+                document.getElementById('userEmail').value = data.user.email ?? '';
+                document.getElementById('userPassword').value = genererPassword();
+
+                document.getElementById('btnSaveUser').disabled = false;
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Utilisateur trouvé',
+                    text: 'Les informations ont été préremplies automatiquement.',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+
+            } else {
+
+                document.getElementById('userNom').value = '';
+                document.getElementById('userPrenom').value = '';
+                document.getElementById('userIne').value = '';
+                document.getElementById('userEmail').value = '';
+                document.getElementById('btnSaveUser').disabled = true;
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Utilisateur introuvable',
+                    text: data.message ?? 'Aucune donnée ne correspond à cet INE ou mail professionnel.'
+                });
+
+            }
+
+        } catch (error) {
+            console.error(error);
+
             Swal.fire({
                 icon: 'error',
-                title: 'Erreur !',
-                html: "<?= session()->getFlashdata('error') ?>",
-                confirmButtonColor: '#d33',
-                timer: 3000,
-                timerProgressBar: true,
-                showConfirmButton: true
+                title: 'Erreur serveur',
+                text: 'Impossible de contacter l’API de recherche.'
             });
-        <?php endif; ?>
 
-        <?php if (session()->getFlashdata('success_update')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Mis Ã  jour !',
-                text: "<?= session()->getFlashdata('success_update') ?>",
-                timer: 2000,
-                showConfirmButton: false
-            });
-        <?php endif; ?>
+        } finally {
+            btnSearchUser.disabled = false;
+            btnSearchUser.innerHTML = '<i class="fa fa-search me-1"></i> Rechercher';
+        }
 
-        <?php if (session()->getFlashdata('success_delete')): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'SupprimÃ© !',
-                text: "<?= session()->getFlashdata('success_delete') ?>",
-                timer: 2000,
-                showConfirmButton: false
-            });
-        <?php endif; ?>
-
-        document.querySelectorAll('.editBtn').forEach(button => {
-            button.addEventListener('click', function () {
-                document.getElementById('edit_id').value = this.dataset.id;
-                document.getElementById('edit_nom').value = this.dataset.nom;
-                document.getElementById('edit_email').value = this.dataset.email;
-                document.getElementById('edit_role').value = this.dataset.role;
-
-                let modal = new bootstrap.Modal(document.getElementById('editUserModal'));
-                modal.show();
-            });
-        });
-
-        document.querySelectorAll('.blockBtn').forEach(button => {
-            button.addEventListener('click', function () {
-                let id = this.dataset.id;
-                let nom = this.dataset.nom;
-
-                Swal.fire({
-                    title: 'Bloquer utilisateur ?',
-                    html: "Voulez-vous bloquer : <br><strong>" + nom + "</strong> ?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#f0ad4e',
-                    cancelButtonText: 'Annuler',
-                    confirmButtonText: 'Oui, bloquer'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "<?= base_url('users/block/') ?>" + id;
-                    }
-                });
-            });
-        });
-
-        document.querySelectorAll('.deleteBtn').forEach(button => {
-            button.addEventListener('click', function () {
-                let id = this.dataset.id;
-                let nom = this.dataset.nom;
-
-                Swal.fire({
-                    title: 'Supprimer utilisateur ?',
-                    html: "Cette action est irrÃ©versible ! <br><strong>" + nom + "</strong>",
-                    icon: 'error',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonText: 'Annuler',
-                    confirmButtonText: 'Oui, supprimer'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "<?= base_url('users/delete/') ?>" + id;
-                    }
-                });
-            });
-        });
     });
+}
+
+
+// ================= SEARCH WITH ENTER =================
+
+const searchUserInput = document.getElementById('searchUser');
+
+if (searchUserInput) {
+    searchUserInput.addEventListener('keyup', function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('btnSearchUser').click();
+        }
+    });
+}
+
+
+// ================= EDIT USER =================
+
+document.querySelectorAll('.editBtn').forEach(button => {
+    button.addEventListener('click', function () {
+
+        document.getElementById('edit_id').value = this.dataset.id;
+        document.getElementById('edit_nom').value = this.dataset.nom;
+        document.getElementById('edit_email').value = this.dataset.email;
+        document.getElementById('edit_role').value = this.dataset.role;
+
+        let modal = new bootstrap.Modal(
+            document.getElementById('editUserModal')
+        );
+
+        modal.show();
+
+    });
+});
+
+
+// ================= BLOCK USER =================
+
+document.querySelectorAll('.blockBtn').forEach(button => {
+    button.addEventListener('click', function () {
+
+        let id = this.dataset.id;
+        let nom = this.dataset.nom;
+
+        Swal.fire({
+            title: 'Bloquer utilisateur ?',
+            html: "Voulez-vous bloquer : <br><strong>" + nom + "</strong> ?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#f0ad4e',
+            cancelButtonText: 'Annuler',
+            confirmButtonText: 'Oui, bloquer'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "<?= base_url('users/block/') ?>" + id;
+            }
+        });
+
+    });
+});
+
+
+// ================= DELETE USER =================
+
+document.querySelectorAll('.deleteBtn').forEach(button => {
+    button.addEventListener('click', function () {
+
+        let id = this.dataset.id;
+        let nom = this.dataset.nom;
+
+        Swal.fire({
+            title: 'Supprimer utilisateur ?',
+            html: "Cette action est irréversible ! <br><strong>" + nom + "</strong>",
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonText: 'Annuler',
+            confirmButtonText: 'Oui, supprimer'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "<?= base_url('users/delete/') ?>" + id;
+            }
+        });
+
+    });
+});
+
 </script>
 
 <?= $this->include('templates/footer') ?>
