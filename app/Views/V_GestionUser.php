@@ -491,12 +491,25 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                     </button>
 
                     <button type="submit"
+                            name="submit_action"
+                            value="save"
                             class="btn btn-success rounded-3 px-4 shadow-sm"
                             id="btnSaveUser"
                             disabled>
 
                         <i class="fa fa-save me-1"></i>
                         Enregistrer l'utilisateur
+                    </button>
+
+                    <button type="submit"
+                            name="submit_action"
+                            value="save_and_send"
+                            class="btn btn-primary rounded-3 px-4 shadow-sm"
+                            id="btnSaveAndSendUser"
+                            disabled>
+
+                        <i class="fa fa-paper-plane me-1"></i>
+                        Enregistrer et envoyer
                     </button>
 
                 </div>
@@ -636,6 +649,11 @@ function resetAddUserForm() {
     if (btnSave) {
         btnSave.disabled = true;
     }
+
+    const btnSaveAndSend = document.getElementById('btnSaveAndSendUser');
+    if (btnSaveAndSend) {
+        btnSaveAndSend.disabled = true;
+    }
 }
 
 
@@ -699,7 +717,16 @@ if (btnSearchUser) {
                 document.getElementById('userEmail').value = data.user.email ?? '';
                 document.getElementById('userPassword').value = genererPassword();
 
-                document.getElementById('btnSaveUser').disabled = false;
+                const btnSaveUser = document.getElementById('btnSaveUser');
+                const btnSaveAndSendUser = document.getElementById('btnSaveAndSendUser');
+
+                if (btnSaveUser) {
+                    btnSaveUser.disabled = false;
+                }
+
+                if (btnSaveAndSendUser) {
+                    btnSaveAndSendUser.disabled = false;
+                }
 
                 Swal.fire({
                     icon: 'success',
@@ -715,7 +742,17 @@ if (btnSearchUser) {
                 document.getElementById('userPrenom').value = '';
                 document.getElementById('userIne').value = '';
                 document.getElementById('userEmail').value = '';
-                document.getElementById('btnSaveUser').disabled = true;
+
+                const btnSaveUser = document.getElementById('btnSaveUser');
+                const btnSaveAndSendUser = document.getElementById('btnSaveAndSendUser');
+
+                if (btnSaveUser) {
+                    btnSaveUser.disabled = true;
+                }
+
+                if (btnSaveAndSendUser) {
+                    btnSaveAndSendUser.disabled = true;
+                }
 
                 Swal.fire({
                     icon: 'error',
@@ -828,6 +865,43 @@ document.querySelectorAll('.deleteBtn').forEach(button => {
     });
 });
 
+</script>
+
+<?php
+$flashSuccess = session()->getFlashdata('success');
+$flashError = session()->getFlashdata('error');
+$flashDelete = session()->getFlashdata('success_delete');
+?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    <?php if ($flashSuccess): ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: <?= json_encode($flashSuccess) ?>,
+        confirmButtonColor: '#198754'
+    });
+    <?php endif; ?>
+
+    <?php if ($flashDelete): ?>
+    Swal.fire({
+        icon: 'success',
+        title: 'Succès',
+        text: <?= json_encode($flashDelete) ?>,
+        confirmButtonColor: '#198754'
+    });
+    <?php endif; ?>
+
+    <?php if ($flashError): ?>
+    Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: <?= json_encode($flashError) ?>,
+        confirmButtonColor: '#d33'
+    });
+    <?php endif; ?>
+});
 </script>
 
 <?= $this->include('templates/footer') ?>

@@ -3,6 +3,7 @@
 <?= $this->include('templates/left_sidebar') ?>
 <?php
 $user_permissions = $user_permissions ?? [];
+$role_permissions_by_role = $role_permissions_by_role ?? [];
 
 $hasProfilActionPermission = static function (array $permissions, int $menuId, int $sousMenuId, int $permissionId): bool {
     foreach ($permissions as $permission) {
@@ -69,6 +70,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
                                             <a href="#" class="btn btn-sm btn-outline-primary editBtn"
                                                data-id="<?= $r['id'] ?>"
                                                data-nom="<?= $r['nom_role'] ?>"
+                                               data-permissions='<?= esc(json_encode($role_permissions_by_role[$r['id']] ?? [], JSON_UNESCAPED_UNICODE), 'attr') ?>'
                                                data-bs-toggle="modal"
                                                data-bs-target="#editProfil">
                                                <i class="fa fa-edit"></i>
@@ -152,6 +154,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
                                     <tbody id="addPermissionContent"></tbody>
                                 </table>
                             </div>
+                            <div id="addSelectedPermissions"></div>
                             <div id="addPermissionMessage" class="alert alert-info">
                                 Cliquez sur un sous menu pour afficher les permissions
                             </div>
@@ -243,6 +246,8 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
 <?php endif; ?>
 <!-- ================= SCRIPT MODAL EDIT & ADD ================= -->
 <script>
+let selectedPermissions = [];
+
 document.addEventListener("DOMContentLoaded", function() {
     // ================== GLOBAL ==================
    const GLOBAL_MENU_IDS = ['6'];
@@ -301,14 +306,11 @@ btn.addEventListener('click', async function(){
 
 const roleId = this.dataset.id;
 const roleNom = this.dataset.nom;
+const rolePermissions = this.dataset.permissions ? JSON.parse(this.dataset.permissions) : [];
 
 document.getElementById('edit_role_id').value = roleId;
 document.getElementById('edit_nom_role').value = roleNom;
-
-const res = await fetch(`<?= base_url('profils/get/') ?>${roleId}`);
-const data = await res.json();
-
-currentPerms = data.permissions || [];
+currentPerms = rolePermissions;
 
 let html = '';
 
@@ -343,8 +345,40 @@ document.getElementById('editPermissionMessage').classList.add('d-none');
 
 let addPermBox = document.getElementById('addPermissionBox');
 let addPermContent = document.getElementById('addPermissionContent');
+let addSelectedPermissionsContainer = document.getElementById('addSelectedPermissions');
+let addPermissionMessage = document.getElementById('addPermissionMessage');
 
-let selectedPermissions = [];
+function syncAddSelectedPermissions() {
+if (!addSelectedPermissionsContainer) {
+return;
+}
+
+addSelectedPermissionsContainer.innerHTML = selectedPermissions
+    .map(value => `<input type="hidden" name="permissions[]" value="${escapeHtmlAttr(value)}">`)
+    .join('');
+}
+
+function escapeHtmlAttr(value) {
+return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+const addProfilModal = document.getElementById('addProfil');
+if (addProfilModal) {
+addProfilModal.addEventListener('show.bs.modal', function() {
+selectedPermissions = [];
+addPermContent.innerHTML = '';
+syncAddSelectedPermissions();
+addPermBox.classList.add('d-none');
+if (addPermissionMessage) {
+addPermissionMessage.classList.remove('d-none');
+}
+});
+}
 
 document.querySelectorAll("#addProfil .menu-item").forEach(menu => {
 
@@ -411,6 +445,7 @@ ${checkedValue(4)}>
 
 addPermContent.innerHTML = html;
 syncGroupedCheckboxes('#addPermissionContent');
+syncAddSelectedPermissions();
 
 
 // sauvegarder les checkbox cochées
@@ -431,6 +466,8 @@ selectedPermissions.push(val);
 selectedPermissions = selectedPermissions.filter(p => p !== val);
 
 }
+
+syncAddSelectedPermissions();
 
 });
 
@@ -515,6 +552,9 @@ Swal.fire("Erreur",data.message,"error");
 
 }
 
+})
+.catch(() => {
+Swal.fire("Erreur", "La création du profil a échoué.", "error");
 });
 
 });
@@ -532,8 +572,11 @@ addForm.addEventListener("submit", function(e){
 
 e.preventDefault();
 
-
 let formData = new FormData(this);
+formData.delete('permissions[]');
+selectedPermissions.forEach(value => {
+formData.append('permissions[]', value);
+});
 
 fetch(this.action,{
 method:"POST",

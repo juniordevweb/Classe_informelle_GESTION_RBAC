@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use App\Services\UserInvitationService;
 
 /**
  * Services Configuration file.
@@ -29,4 +30,13 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    public static function userInvitationService(bool $getShared = true): UserInvitationService
+    {
+        if ($getShared) {
+            return static::getSharedInstance('userInvitationService');
+        }
+
+        return new UserInvitationService();
+    }
 }

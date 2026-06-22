@@ -7,6 +7,11 @@ use CodeIgniter\Config\BaseConfig;
 class App extends BaseConfig
 {
     /**
+     * Nom logique de l'application utilisé dans les templates, emails, etc.
+     */
+    public string $appName = 'Classe Passerelle';
+
+    /**
      * --------------------------------------------------------------------------
      * Base Site URL
      * --------------------------------------------------------------------------

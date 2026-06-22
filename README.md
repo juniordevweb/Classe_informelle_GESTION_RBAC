@@ -28,6 +28,21 @@ to your `app` folder. The affected files can be copied or merged from
 Copy `env` to `.env` and tailor for your app, specifically the baseURL
 and any database settings.
 
+## Local email with Mailpit
+
+For local development, this project uses Mailpit as the SMTP sink so outgoing emails are captured instead of being delivered to real inboxes.
+
+1. Start Mailpit on `127.0.0.1:1025` for SMTP and `http://localhost:8025` for the web UI.
+2. Keep the `.env` email settings pointed to Mailpit:
+   - `email.protocol = smtp`
+   - `email.SMTPHost = 127.0.0.1`
+   - `email.SMTPPort = 1025`
+   - `email.SMTPCrypto =`
+3. Create a user with the **Enregistrer et envoyer** button.
+4. Open `http://localhost:8025` to confirm the message appears in Mailpit.
+
+If you prefer Docker, use the provided `docker-compose.mailpit.yml` file.
+
 ## Important Change with index.php
 
 `index.php` is no longer in the root of the project! It has been moved inside the *public* folder,

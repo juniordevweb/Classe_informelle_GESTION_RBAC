@@ -30,7 +30,15 @@ class C_ProfilController extends BaseController
         $data['user_permissions'] = $this->getUserPermissions();
         $roles = $this->roleModel->findAll();
         $permissions = $this->permissionModel->findAll();
+        $rolePermissions = $this->rolePermissionModel
+            ->select('role_id, menu_id, sous_menu_id, permission_id')
+            ->findAll();
         $menus = $this->menuModel->findAll();
+        $permissionsByRole = [];
+
+        foreach ($rolePermissions as $permission) {
+            $permissionsByRole[(int) $permission['role_id']][] = $permission;
+        }
 
         foreach ($menus as &$menu) {
             $menu['sous_menus'] = $this->sousMenuModel
@@ -41,6 +49,7 @@ class C_ProfilController extends BaseController
         $data['roles'] = $roles;
         $data['menus'] = $menus;
         $data['permissions'] = $permissions;
+        $data['role_permissions_by_role'] = $permissionsByRole;
 
         return view('V_GestionProfil', $data);
     }

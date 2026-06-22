@@ -19,6 +19,29 @@ function hasPermission($permissions, $menu_id, $sous_menu_id = 0, $perm_id = 1)
     return false;
 }
 
+/**
+ * Vérifie si l'utilisateur possède au moins une des permissions fournies
+ * $perm_ids peut être un tableau d'IDs de permission (ex: [1,2,3])
+ */
+function hasAnyPermission($permissions, $menu_id, $sous_menu_id = 0, $perm_ids = [1])
+{
+    foreach ($permissions as $p) {
+        $dbSousMenu = ($p['sous_menu_id'] == 0)
+            ? $p['menu_id']
+            : $p['sous_menu_id'];
+
+        if (
+            $p['menu_id'] == $menu_id &&
+            $dbSousMenu == $sous_menu_id &&
+            in_array($p['permission_id'], $perm_ids)
+        ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 $user_permissions = $user_permissions ?? [];
 $fullName = trim(
     implode(' ', array_filter([
@@ -37,6 +60,8 @@ $simpleMenuPermissions = [
     'superviseur' => ['menu_id' => 3, 'sous_menu_id' => 3],
     'operateur' => ['menu_id' => 4, 'sous_menu_id' => 4],
     'structures' => ['menu_id' => 8, 'sous_menu_id' => 15],
+    'apprenant' => ['menu_id' => 5, 'sous_menu_id' => 13],
+    'classes' => ['menu_id' => 7, 'sous_menu_id' => 114],
 ];
 
 $showParam = hasPermission($user_permissions, 6, 6, 1);
@@ -155,7 +180,7 @@ $showParam = hasPermission($user_permissions, 6, 6, 1);
                         </li>
                     <?php endif; ?>
 
-                    <?php if (hasPermission($user_permissions, 5, 13, 1)): ?>
+                    <?php if (hasAnyPermission($user_permissions, 5, 13, [1,2,3])): ?>
                         <li class="<?= (uri_string() == 'apprenant') ? 'active' : '' ?>">
                             <a href="<?= base_url('apprenant') ?>" class="waves-effect">
                                 <i class="md md-school"></i>
