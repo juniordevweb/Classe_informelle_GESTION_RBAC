@@ -53,6 +53,9 @@ class C_AuthController extends BaseController
             'logged_in'        => true,
         ]);
 
+        // Snapshot the sidebar at login time so menu changes become visible only after reconnection.
+        session()->set('sidebar_menus', getSidebarMenus($permissions));
+
         return redirect()->to('/dashboard');
         
     }
@@ -65,4 +68,3 @@ class C_AuthController extends BaseController
     }
 
 }
-

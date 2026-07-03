@@ -17,7 +17,7 @@
 
         <link rel="shortcut icon" href="<?= base_url('assets/images/favicon_1.icon')?>">
 
-        <link href="<?= base_url('../plugins/sweetalert2/sweetalert2.css')?>" rel="stylesheet" type="text/css">
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" type="text/css">
 
         <!-- Custom Files -->
         <link href="<?= base_url('assets/css/bootstrap.min.css')?>" rel="stylesheet" type="text/css" />

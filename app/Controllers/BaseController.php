@@ -49,10 +49,10 @@ abstract class BaseController extends Controller
 
     protected function getUserPermissions()
     {
-        $sessionPermissions = session()->get('user_permissions');
+        $permissions = session()->get('user_permissions');
 
-        if (is_array($sessionPermissions)) {
-            return $sessionPermissions;
+        if (is_array($permissions)) {
+            return $permissions;
         }
 
         $role_id = session()->get('role_id');
@@ -61,6 +61,8 @@ abstract class BaseController extends Controller
             return [];
         }
 
+        // Load once and keep the permission snapshot in the current session.
+        // Changes in the database become visible after a fresh login.
         $permissions = $this->rolePermissionModel
             ->where('role_id', $role_id)
             ->findAll();

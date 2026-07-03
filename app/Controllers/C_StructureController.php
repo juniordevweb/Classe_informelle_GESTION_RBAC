@@ -4,29 +4,23 @@ namespace App\Controllers;
 
 use App\Models\M_StructureModel;
 use App\Models\M_OperateurModel;
-use App\Requests\StoreStructureRequest;
 use App\Requests\UpdateStructureRequest;
 use App\Policies\StructurePolicy;
-use App\Services\StructureCodeService;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class C_StructureController extends BaseController
 {
     protected $structureModel;
     protected $operateurModel;
-    protected $storeRequest;
     protected $updateRequest;
     protected $policy;
-    protected $codeService;
 
     public function __construct()
     {
         $this->structureModel = new M_StructureModel();
         $this->operateurModel = new M_OperateurModel();
-        $this->storeRequest = new StoreStructureRequest();
         $this->updateRequest = new UpdateStructureRequest();
         $this->policy = new StructurePolicy();
-        $this->codeService = new StructureCodeService();
     }
 
     /**
@@ -91,50 +85,6 @@ class C_StructureController extends BaseController
             'structuresFermees' => $structuresFermees,
             'structuresValidees' => $structuresValidees,
         ]);
-    }
-
-    /**
-     * Affiche le formulaire de création.
-     */
-    public function create()
-    {
-        $user = session()->get();
-
-        if (!$this->policy->create($user)) {
-            return redirect()->to('/structures')->with('error', 'Accès non autorisé.');
-        }
-
-        $operateurs = $this->operateurModel->findAll();
-
-        return view('V_structures_create', [
-            'operateurs' => $operateurs,
-        ]);
-    }
-
-    /**
-     * Enregistre une nouvelle structure.
-     */
-    public function store()
-    {
-        $user = session()->get();
-
-        if (!$this->policy->create($user)) {
-            return redirect()->to('/structures')->with('error', 'Accès non autorisé.');
-        }
-
-        $data = $this->request->getPost();
-
-        if (!$this->storeRequest->validate($data)) {
-            return redirect()->back()->withInput()->with('errors', $this->storeRequest->getErrors());
-        }
-
-        $data['code_structure'] = $this->codeService->generateCode();
-
-        if ($this->structureModel->insert($data)) {
-            return redirect()->to('/structures')->with('success', 'Structure créée avec succès.');
-        }
-
-        return redirect()->back()->withInput()->with('error', 'Erreur lors de la création de la structure.');
     }
 
     /**

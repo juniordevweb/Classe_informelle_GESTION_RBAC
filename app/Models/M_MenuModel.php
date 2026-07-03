@@ -8,5 +8,5 @@ class M_MenuModel extends Model
 {
     protected $table = 'menus';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['nom_menu', 'url', 'icone', 'ordre'];
+    protected $allowedFields = ['nom_menu', 'url', 'icone', 'ordre', 'permission_id', 'statut'];
 }

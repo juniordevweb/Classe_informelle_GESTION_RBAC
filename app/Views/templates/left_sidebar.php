@@ -54,17 +54,33 @@ if ($fullName === '') {
     $fullName = 'Utilisateur';
 }
 
-$simpleMenuPermissions = [
-    'dashboard' => ['menu_id' => 1, 'sous_menu_id' => 1],
-    'facilitateur' => ['menu_id' => 2, 'sous_menu_id' => 2],
-    'superviseur' => ['menu_id' => 3, 'sous_menu_id' => 3],
-    'operateur' => ['menu_id' => 4, 'sous_menu_id' => 4],
-    'structures' => ['menu_id' => 8, 'sous_menu_id' => 15],
-    'apprenant' => ['menu_id' => 5, 'sous_menu_id' => 13],
-    'classes' => ['menu_id' => 7, 'sous_menu_id' => 114],
-];
+$sidebarMenus = getSidebarMenus($user_permissions);
 
-$showParam = hasPermission($user_permissions, 6, 6, 1);
+$normalizeLabel = static function (?string $value): string {
+    $value = trim((string) $value);
+    $transliterated = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+
+    if ($transliterated !== false) {
+        $value = $transliterated;
+    }
+
+    return strtolower($value);
+};
+
+$isParametersMenu = static function (array $menu) use ($normalizeLabel): bool {
+    return ((int) ($menu['id'] ?? 0) === 6)
+        || $normalizeLabel($menu['nom_menu'] ?? '') === 'parametres';
+};
+
+$directMenuRoutes = [
+    1 => 'dashboard',
+    2 => 'facilitateur',
+    3 => 'superviseur',
+    4 => 'operateur',
+    5 => 'apprenant',
+    7 => 'classes',
+    8 => 'structures',
+];
 ?>
 <style>
     .sidebar-logout-wrap {
@@ -100,6 +116,10 @@ $showParam = hasPermission($user_permissions, 6, 6, 1);
 
     .sidebar-logout-btn i {
         font-size: 18px;
+    }
+
+    .submenu-toggle {
+        cursor: pointer;
     }
 </style>
 <div class="left side-menu">
@@ -144,93 +164,59 @@ $showParam = hasPermission($user_permissions, 6, 6, 1);
 
             <div id="sidebar-menu">
                 <ul>
-                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['dashboard']['menu_id'], $simpleMenuPermissions['dashboard']['sous_menu_id'], 1)): ?>
-                        <li class="<?= (uri_string() == 'dashboard') ? 'active' : '' ?>">
-                            <a href="<?= base_url('/dashboard') ?>" class="waves-effect">
-                                <i class="md md-home"></i>
-                                <span>Tableau de bord</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
+                    <?php
+                    $currentRoute = trim(uri_string(), '/');
+                    foreach ($sidebarMenus as $menu):
+                        $menuId = (int) ($menu['id'] ?? 0);
+                        $menuRoute = trim((string) ($menu['url'] ?? ''), '/');
+                        $children = $menu['children'] ?? [];
+                        $resolvedRoute = $directMenuRoutes[$menuId] ?? $menuRoute;
+                        $menuHref = $resolvedRoute !== '' ? base_url($resolvedRoute) : '';
+                        $menuActive = $currentRoute !== '' && $resolvedRoute !== '' && $currentRoute === $resolvedRoute;
+                        foreach ($children as $child) {
+                            $childRoute = trim((string) ($child['url'] ?? ''), '/');
+                            if ($childRoute !== '' && $childRoute === $currentRoute) {
+                                $menuActive = true;
+                                break;
+                            }
+                        }
 
-                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['facilitateur']['menu_id'], $simpleMenuPermissions['facilitateur']['sous_menu_id'], 1)): ?>
-                        <li class="<?= (uri_string() == 'facilitateur') ? 'active' : '' ?>">
-                            <a href="<?= base_url('facilitateur') ?>" class="waves-effect">
-                                <i class="md md-person"></i>
-                                <span>Facilitateur</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
+                        $isDropdownMenu = $isParametersMenu($menu) && ! empty($children);
+                    ?>
+                        <?php if ($isDropdownMenu): ?>
+                            <li class="has_sub <?= $menuActive ? 'active' : '' ?>">
+                                <a href="javascript:void(0);" class="waves-effect sidebar-toggle-link <?= $menuActive ? 'active subdrop' : '' ?>">
+                                    <i class="<?= esc(sidebarIconClass($menu['icone'] ?? null)) ?>"></i>
+                                    <span><?= esc($menu['nom_menu'] ?? '') ?></span>
+                                    <span class="pull-right submenu-toggle" role="button" tabindex="0" aria-label="Afficher ou masquer les sous-menus">
+                                        <i class="md md-add"></i>
+                                    </span>
+                                </a>
 
-                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['superviseur']['menu_id'], $simpleMenuPermissions['superviseur']['sous_menu_id'], 1)): ?>
-                        <li class="<?= (uri_string() == 'superviseur') ? 'active' : '' ?>">
-                            <a href="<?= base_url('superviseur') ?>" class="waves-effect">
-                                <i class="md md-people"></i>
-                                <span>Superviseur</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['operateur']['menu_id'], $simpleMenuPermissions['operateur']['sous_menu_id'], 1)): ?>
-                        <li class="<?= (uri_string() == 'operateur') ? 'active' : '' ?>">
-                            <a href="<?= base_url('operateur') ?>" class="waves-effect">
-                                <i class="md md-laptop"></i>
-                                <span>Operateur</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php if (hasAnyPermission($user_permissions, 5, 13, [1,2,3])): ?>
-                        <li class="<?= (uri_string() == 'apprenant') ? 'active' : '' ?>">
-                            <a href="<?= base_url('apprenant') ?>" class="waves-effect">
-                                <i class="md md-school"></i>
-                                <span>Apprenant</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission($user_permissions, 7, 14, 1)): ?>
-                        <li class="<?= (uri_string() == 'classes') ? 'active' : '' ?>">
-                            <a href="<?= base_url('classes') ?>" class="waves-effect">
-                                <i class="md md-business"></i>
-                                <span>Classes</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php if (hasPermission($user_permissions, $simpleMenuPermissions['structures']['menu_id'], $simpleMenuPermissions['structures']['sous_menu_id'], 1)): ?>
-                        <li class="<?= (uri_string() == 'structures') ? 'active' : '' ?>">
-                            <a href="<?= base_url('structures') ?>" class="waves-effect">
-                                <i class="md md-business"></i>
-                                <span>Structures</span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-
-                    <?php if ($showParam): ?>
-                        <li
-                            class="has_sub <?= (in_array(uri_string(), ['users', 'profils', 'tables-editable'])) ? 'active' : '' ?>">
-                            <a href="javascript:void(0);" class="waves-effect">
-                                <i class="md md-settings"></i>
-                                <span>Parametres</span>
-                                <span class="pull-right"><i class="md md-add"></i></span>
-                            </a>
-
-                            <ul class="list-unstyled">
-                                <?php if ($showParam): ?>
-                                    <li>
-                                        <a href="<?= base_url('users') ?>">Gestion users</a>
-                                    </li>
-                                <?php endif; ?>
-
-                                <?php if ($showParam): ?>
-                                    <li>
-                                        <a href="<?= base_url('profils') ?>">Gestion profil</a>
-                                    </li>
-                                <?php endif; ?>
-                            </ul>
-                        </li>
-                    <?php endif; ?>
+                                <ul class="list-unstyled">
+                                    <?php foreach ($children as $child): ?>
+                                        <?php
+                                        $childRoute = trim((string) ($child['url'] ?? ''), '/');
+                                        $childActive = $currentRoute !== '' && $childRoute !== '' && $childRoute === $currentRoute;
+                                        ?>
+                                        <li class="<?= $childActive ? 'active' : '' ?>">
+                                            <a href="<?= base_url($childRoute) ?>">
+                                                <i class="<?= esc(sidebarIconClass($child['icon'] ?? null, 'md md-circle')) ?>"></i>
+                                                <?= esc($child['nom_sous_menu'] ?? '') ?>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </li>
+                        <?php elseif ($menuHref !== ''): ?>
+                            <li class="<?= $menuActive ? 'active' : '' ?>">
+                                <a href="<?= esc($menuHref) ?>" class="waves-effect">
+                                    <i class="<?= esc(sidebarIconClass($menu['icone'] ?? null)) ?>"></i>
+                                    <span><?= esc($menu['nom_menu'] ?? '') ?></span>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
 
                     <div class="clearfix"></div>
                 </ul>

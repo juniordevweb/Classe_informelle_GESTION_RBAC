@@ -12,6 +12,11 @@ class App extends BaseConfig
     public string $appName = 'Classe Passerelle';
 
     /**
+     * API distante utilisée pour la recherche de personnel depuis la vue utilisateurs.
+     */
+    public string $personnelApiUrl = 'https://apps.education.sn/C_personnel_api/getIEN_info';
+
+    /**
      * --------------------------------------------------------------------------
      * Base Site URL
      * --------------------------------------------------------------------------
@@ -204,4 +209,9 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        $this->personnelApiUrl = env('app.personnelApiUrl', $this->personnelApiUrl);
+    }
 }

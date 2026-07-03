@@ -51,8 +51,6 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Structures
     $routes->get('structures', 'C_StructureController::index', ['filter' => 'auth']);
-    $routes->get('structures/create', 'C_StructureController::create', ['filter' => 'auth']);
-    $routes->post('structures/store', 'C_StructureController::store', ['filter' => 'auth']);
     $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'auth']);
     $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'auth']);
     $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'auth']);
@@ -72,6 +70,15 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 $routes->get('users/search-personnel', 'C_UserController::search_personnel');
 
+    // Gestion des menus
+    $routes->get('menus', 'C_MenuController::index', ['filter' => 'permission:6,17,1']);
+    $routes->post('menus/save-menu', 'C_MenuController::saveMenu', ['filter' => 'permission:6,17,2']);
+    $routes->post('menus/update-menu', 'C_MenuController::updateMenu', ['filter' => 'permission:6,17,3']);
+    $routes->get('menus/delete-menu/(:num)', 'C_MenuController::deleteMenu/$1', ['filter' => 'permission:6,17,4']);
+    $routes->post('menus/save-submenu', 'C_MenuController::saveSubMenu', ['filter' => 'permission:6,17,2']);
+    $routes->post('menus/update-submenu', 'C_MenuController::updateSubMenu', ['filter' => 'permission:6,17,3']);
+    $routes->get('menus/delete-submenu/(:num)', 'C_MenuController::deleteSubMenu/$1', ['filter' => 'permission:6,17,4']);
+
     // Profils
     $routes->get('profils', 'C_ProfilController::index', ['filter' => 'permission:6,6,1']);
     $routes->get('profils/get/(:num)', 'C_ProfilController::getProfil/$1', ['filter' => 'permission:6,6,1']);
@@ -80,4 +87,22 @@ $routes->get('users/search-personnel', 'C_UserController::search_personnel');
     $routes->post('profils/delete_ajax/(:num)', 'C_ProfilController::delete_ajax/$1', ['filter' => 'permission:6,6,4']);
     $routes->post('profils/save', 'C_ProfilController::save', ['filter' => 'permission:6,6,2']);
     $routes->get('profils/getProfil/(:num)', 'Profils::getProfil/$1', ['filter' => 'permission:6,6,1']);
+
+    if (function_exists('registerDynamicMenuRoutes')) {
+        registerDynamicMenuRoutes($routes, [
+            'dashboard',
+            'facilitateur',
+            'superviseur',
+            'operateur',
+            'apprenant',
+            'classes',
+            'structures',
+            'users',
+            'users/search-personnel',
+            'menus',
+            'profils',
+            'login',
+            'logout',
+        ]);
+    }
 });

@@ -88,14 +88,35 @@ class C_UserController extends BaseController
         // 2) Fallback réseau: seulement si la base locale ne contient rien.
         try {
             $client = \Config\Services::curlrequest();
+            $apiUrl = (string) config('App')->personnelApiUrl;
 
-            $response = $client->get('https://apps.education.sn/C_personnel_api/getIEN_info', [
+            if ($apiUrl === '') {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => "L'URL de l'API personnel n'est pas configurée.",
+                ]);
+            }
+
+            $response = $client->get($apiUrl, [
                 'query' => [
                     'ien' => $normalizedSearch,
                 ],
                 'timeout' => 15,
+                'connect_timeout' => 5,
                 'http_errors' => false,
             ]);
+
+            $statusCode = $response->getStatusCode();
+
+            if ($statusCode < 200 || $statusCode >= 300) {
+                return $this->response->setJSON([
+                    'status' => 'error',
+                    'message' => "L'API de personnel a répondu avec le code HTTP {$statusCode}.",
+                    'details' => [
+                        'http_code' => $statusCode,
+                    ],
+                ]);
+            }
 
             $body = $response->getBody();
             $contentType = strtolower((string) $response->getHeaderLine('Content-Type'));
@@ -108,7 +129,7 @@ class C_UserController extends BaseController
                     'message' => 'Le service distant ne renvoie pas de JSON sur cette URL.',
                     'details' => [
                         'content_type' => $contentType,
-                        'http_code' => $response->getStatusCode(),
+                        'http_code' => $statusCode,
                     ],
                 ]);
             }
@@ -118,7 +139,7 @@ class C_UserController extends BaseController
                     'status' => 'error',
                     'message' => 'Le service distant renvoie une page HTML au lieu de l’API attendue.',
                     'details' => [
-                        'http_code' => $response->getStatusCode(),
+                        'http_code' => $statusCode,
                     ],
                 ]);
             }
@@ -137,7 +158,7 @@ class C_UserController extends BaseController
                     'api_response' => $data,
                 ]);
             }
-
+  
             $personnel = $data['personnel'][0];
 
             return $this->response->setJSON([
@@ -150,11 +171,23 @@ class C_UserController extends BaseController
                     'email'  => $personnel['email_pro'] ?? '',
                 ],
             ]);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            $exceptionMessage = $e->getMessage();
+            $isDnsFailure = stripos($exceptionMessage, 'Could not resolve host') !== false
+                || (int) $e->getCode() === 6;
+
+            log_message('error', 'User search API connection failed: {message}', [
+                'message' => $exceptionMessage,
+            ]);
+
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'Erreur lors de la connexion avec l’API.',
-                'details' => $e->getMessage(),
+                'message' => $isDnsFailure
+                    ? "Impossible de joindre l'API de personnel depuis ce serveur."
+                    : "Erreur lors de la connexion avec l'API de personnel.",
+               // 'details' => $exceptionMessage,
+               // 'api_url' => $apiUrl ?? null,
+               
             ]);
         }
     }
@@ -218,14 +251,6 @@ class C_UserController extends BaseController
             if ($result === false) {
                 throw new \RuntimeException('Impossible d’enregistrer l’utilisateur.');
             }
-
-            if ($sendEmail) {
-                $this->userInvitationService->sendWelcomeEmail([
-                    'nom' => $nom,
-                    'prenom' => $prenom,
-                    'email' => $email,
-                ], $rawPassword);
-            }
         } catch (\Throwable $e) {
             log_message('error', 'User creation flow failed: {message}', [
                 'message' => $e->getMessage(),
@@ -233,14 +258,34 @@ class C_UserController extends BaseController
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', $sendEmail
-                    ? 'Utilisateur créé, mais l’envoi de l’e-mail a échoué.'
-                    : 'Impossible d’enregistrer l’utilisateur.');
+                ->with('error', 'Impossible d’enregistrer l’utilisateur.');
+        }
+
+        $emailSendFailed = false;
+        $emailSendError = '';
+
+        if ($sendEmail) {
+            try {
+                $this->userInvitationService->sendWelcomeEmail([
+                    'nom' => $nom,
+                    'prenom' => $prenom,
+                    'email' => $email,
+                ], $rawPassword);
+            } catch (\Throwable $e) {
+                $emailSendFailed = true;
+                $emailSendError = $e->getMessage();
+
+               log_message('error', 'Welcome email could not be sent: {message}', [
+                  'message' => $emailSendError,
+               ]);
+            }
         }
 
         return redirect()->to('/users')
             ->with('success', $sendEmail
-                ? 'Utilisateur créé et e-mail envoyé avec succès dans Mailpit.'
+                ? ($emailSendFailed
+                    ? 'Utilisateur créé avec succès, mais l’envoi de l’e-mail a échoué.'
+                    : 'Utilisateur créé et e-mail envoyé avec succès dans Mailpit.')
                 : 'Utilisateur créé avec succès.');
     }
 

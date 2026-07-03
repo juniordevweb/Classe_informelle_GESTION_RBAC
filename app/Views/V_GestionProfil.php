@@ -124,6 +124,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
                                     <ul class="d-none" id="add_menu_<?= $menu['id'] ?>">
                                         <?php if (!empty($menu['sous_menus'])): ?>
                                             <?php foreach ($menu['sous_menus'] as $sm): ?>
+                                                <?php if (trim((string) ($sm['url'] ?? ''), '/') === 'structures/create') { continue; } ?>
                                                 <li class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
                                                     <?= $sm['nom_sous_menu'] ?>
                                                 </li>
@@ -199,6 +200,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
                                 <div class="d-none" id="edit_menu_<?= $menu['id'] ?>">
                                     <?php if (!empty($menu['sous_menus'])): ?>
                                         <?php foreach ($menu['sous_menus'] as $sm): ?>
+                                            <?php if (trim((string) ($sm['url'] ?? ''), '/') === 'structures/create') { continue; } ?>
                                             <div class="sousMenuItem" data-menu="<?= $menu['id'] ?>" data-sousmenu="<?= $sm['id'] ?>">
                                                 <?= $sm['nom_sous_menu'] ?>
                                             </div>

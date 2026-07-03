@@ -8,6 +8,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 
 class PermissionFilter implements FilterInterface
 {
+    private const GLOBAL_MENU_IDS = ['6'];
+
     protected function getDeniedMessage($permissionId): string
     {
         return match ((int) $permissionId) {
@@ -37,6 +39,9 @@ class PermissionFilter implements FilterInterface
 
         $permissions = session()->get('user_permissions') ?? [];
         $permission = null;
+        $normalizedSousMenuId = in_array((string) $menuId, self::GLOBAL_MENU_IDS, true)
+            ? (int) $menuId
+            : (int) $sousMenuId;
 
         foreach ($permissions as $currentPermission) {
             $dbSousMenuId = ((int) ($currentPermission['sous_menu_id'] ?? 0) === 0)
@@ -45,7 +50,10 @@ class PermissionFilter implements FilterInterface
 
             if (
                 (int) ($currentPermission['menu_id'] ?? 0) === (int) $menuId &&
-                $dbSousMenuId === (int) $sousMenuId &&
+                (
+                    $dbSousMenuId === (int) $sousMenuId
+                    || $dbSousMenuId === $normalizedSousMenuId
+                ) &&
                 (int) ($currentPermission['permission_id'] ?? 0) === (int) $permissionId
             ) {
                 $permission = $currentPermission;

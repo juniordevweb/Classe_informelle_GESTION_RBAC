@@ -266,10 +266,18 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                         Rechercher l'utilisateur
                                     </button>
 
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-lg w-100 rounded-3 mt-2"
+                                            id="btnManualUser">
+
+                                        <i class="fa fa-pen me-2"></i>
+                                        Saisie manuelle
+                                    </button>
+
                                     <div class="alert alert-light border mt-4 mb-0 rounded-3">
                                         <small class="text-muted">
                                             <i class="fa fa-circle-info me-1"></i>
-                                            Les informations seront remplies automatiquement après la recherche.
+                                            Les informations peuvent être remplies automatiquement ou saisies manuellement.
                                         </small>
                                     </div>
 
@@ -321,11 +329,10 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                                 </span>
 
                                                 <input type="text"
-                                                       name="nom"
-                                                       class="form-control"
-                                                       id="userNom"
-                                                       placeholder="Nom"
-                                                       readonly
+                                               name="nom"
+                                               class="form-control"
+                                               id="userNom"
+                                               placeholder="Nom"
                                                        required>
                                             </div>
                                         </div>
@@ -342,11 +349,10 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                                 </span>
 
                                                 <input type="text"
-                                                       name="prenom"
-                                                       class="form-control"
-                                                       id="userPrenom"
-                                                       placeholder="Prénom"
-                                                       readonly
+                                               name="prenom"
+                                               class="form-control"
+                                               id="userPrenom"
+                                               placeholder="Prénom"
                                                        required>
                                             </div>
                                         </div>
@@ -367,11 +373,10 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                                 </span>
 
                                                 <input type="text"
-                                                       name="ine"
-                                                       class="form-control"
-                                                       id="userIne"
-                                                       placeholder="INE"
-                                                       readonly
+                                               name="ine"
+                                               class="form-control"
+                                               id="userIne"
+                                               placeholder="INE"
                                                        required>
                                             </div>
                                         </div>
@@ -388,11 +393,10 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                                 </span>
 
                                                 <input type="email"
-                                                       name="email"
-                                                       class="form-control"
-                                                       id="userEmail"
-                                                       placeholder="Mail professionnel"
-                                                       readonly
+                                               name="email"
+                                               class="form-control"
+                                               id="userEmail"
+                                               placeholder="Mail professionnel"
                                                        required>
                                             </div>
                                         </div>
@@ -490,7 +494,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                         Annuler
                     </button>
 
-                    <button type="submit"
+                   <!-- // <button type="submit"
                             name="submit_action"
                             value="save"
                             class="btn btn-success rounded-3 px-4 shadow-sm"
@@ -499,7 +503,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
 
                         <i class="fa fa-save me-1"></i>
                         Enregistrer l'utilisateur
-                    </button>
+                    </button> -->
 
                     <button type="submit"
                             name="submit_action"
@@ -679,121 +683,6 @@ if (generateBtn) {
 }
 
 
-// ================= SEARCH USER API =================
-
-const btnSearchUser = document.getElementById('btnSearchUser');
-
-if (btnSearchUser) {
-    btnSearchUser.addEventListener('click', async function () {
-
-        const searchInput = document.getElementById('searchUser');
-        const search = searchInput.value.trim();
-
-        if (search === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Attention',
-                text: 'Veuillez saisir un INE ou un mail professionnel.'
-            });
-
-            return;
-        }
-
-        btnSearchUser.disabled = true;
-        btnSearchUser.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Recherche...';
-
-        try {
-          const response = await fetch(
-    `<?= base_url('users/search-personnel') ?>?q=${encodeURIComponent(search)}`
-);
-
-            const data = await response.json();
-
-            if (data.status === 'success' && data.user) {
-
-                document.getElementById('userNom').value = data.user.nom ?? '';
-                document.getElementById('userPrenom').value = data.user.prenom ?? '';
-                document.getElementById('userIne').value = data.user.ine ?? '';
-                document.getElementById('userEmail').value = data.user.email ?? '';
-                document.getElementById('userPassword').value = genererPassword();
-
-                const btnSaveUser = document.getElementById('btnSaveUser');
-                const btnSaveAndSendUser = document.getElementById('btnSaveAndSendUser');
-
-                if (btnSaveUser) {
-                    btnSaveUser.disabled = false;
-                }
-
-                if (btnSaveAndSendUser) {
-                    btnSaveAndSendUser.disabled = false;
-                }
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Utilisateur trouvé',
-                    text: 'Les informations ont été préremplies automatiquement.',
-                    timer: 1800,
-                    showConfirmButton: false
-                });
-
-            } else {
-
-                document.getElementById('userNom').value = '';
-                document.getElementById('userPrenom').value = '';
-                document.getElementById('userIne').value = '';
-                document.getElementById('userEmail').value = '';
-
-                const btnSaveUser = document.getElementById('btnSaveUser');
-                const btnSaveAndSendUser = document.getElementById('btnSaveAndSendUser');
-
-                if (btnSaveUser) {
-                    btnSaveUser.disabled = true;
-                }
-
-                if (btnSaveAndSendUser) {
-                    btnSaveAndSendUser.disabled = true;
-                }
-
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Utilisateur introuvable',
-                    text: data.message ?? 'Aucune donnée ne correspond à cet INE ou mail professionnel.'
-                });
-
-            }
-
-        } catch (error) {
-            console.error(error);
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur serveur',
-                text: 'Impossible de contacter l’API de recherche.'
-            });
-
-        } finally {
-            btnSearchUser.disabled = false;
-            btnSearchUser.innerHTML = '<i class="fa fa-search me-1"></i> Rechercher';
-        }
-
-    });
-}
-
-
-// ================= SEARCH WITH ENTER =================
-
-const searchUserInput = document.getElementById('searchUser');
-
-if (searchUserInput) {
-    searchUserInput.addEventListener('keyup', function (event) {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            document.getElementById('btnSearchUser').click();
-        }
-    });
-}
-
-
 // ================= EDIT USER =================
 
 document.querySelectorAll('.editBtn').forEach(button => {
@@ -812,6 +701,8 @@ document.querySelectorAll('.editBtn').forEach(button => {
 
     });
 });
+
+
 
 
 // ================= BLOCK USER =================
