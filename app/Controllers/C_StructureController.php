@@ -6,6 +6,8 @@ use App\Models\M_StructureModel;
 use App\Models\M_OperateurModel;
 use App\Requests\UpdateStructureRequest;
 use App\Policies\StructurePolicy;
+use App\Services\StructureCodeService;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class C_StructureController extends BaseController
@@ -14,6 +16,7 @@ class C_StructureController extends BaseController
     protected $operateurModel;
     protected $updateRequest;
     protected $policy;
+    protected $codeService;
 
     public function __construct()
     {
@@ -21,6 +24,72 @@ class C_StructureController extends BaseController
         $this->operateurModel = new M_OperateurModel();
         $this->updateRequest = new UpdateStructureRequest();
         $this->policy = new StructurePolicy();
+        $this->codeService = new StructureCodeService();
+    }
+
+    /**
+     * Enregistre une nouvelle structure.
+     */
+    public function store()
+    {
+        $user = session()->get();
+
+        if (!$this->policy->create($user)) {
+            return redirect()->to('/structures')->with('error', 'Accès non autorisé.');
+        }
+
+        $data = [
+            'code_structure' => $this->codeService->generateCode(),
+            'nom_structure' => trim((string) $this->request->getPost('nom_structure')),
+            'region' => trim((string) $this->request->getPost('region')),
+            'departement' => trim((string) $this->request->getPost('departement')),
+            'commune' => trim((string) $this->request->getPost('commune')),
+            'quartier' => trim((string) $this->request->getPost('quartier')),
+            'ia' => trim((string) $this->request->getPost('ia')),
+            'ief' => trim((string) $this->request->getPost('ief')),
+            'latitude' => $this->normalizeDecimal($this->request->getPost('latitude')),
+            'longitude' => $this->normalizeDecimal($this->request->getPost('longitude')),
+            'langue_nationale' => trim((string) $this->request->getPost('langue_nationale')),
+            'operateur_id' => (int) $this->request->getPost('operateur_id'),
+            'etat' => $this->request->getPost('etat') ?: 'EN_ATTENTE',
+        ];
+
+        $rules = [
+            'code_structure' => 'required|is_unique[structures.code_structure]|exact_length[10]',
+            'nom_structure' => 'required|max_length[255]',
+            'region' => 'required|max_length[255]',
+            'departement' => 'required|max_length[255]',
+            'commune' => 'required|max_length[255]',
+            'quartier' => 'required|max_length[255]',
+            'ia' => 'required|max_length[255]',
+            'ief' => 'required|max_length[255]',
+            'latitude' => 'permit_empty|decimal',
+            'longitude' => 'permit_empty|decimal',
+            'langue_nationale' => 'required|max_length[255]',
+            'operateur_id' => 'required|integer|is_not_unique[operateur.id]',
+            'etat' => 'required|in_list[EN_ATTENTE,VALIDE,OUVERT,FERME,GELE]',
+        ];
+
+        if (! $this->validateData($data, $rules)) {
+            return redirect()->to('/structures')
+                ->withInput()
+                ->with('error', implode(' ', $this->validator->getErrors()));
+        }
+
+        try {
+            if (! $this->structureModel->insert($data)) {
+                return redirect()->to('/structures')
+                    ->withInput()
+                    ->with('error', 'Impossible de creer la structure.');
+            }
+        } catch (DatabaseException $e) {
+            return redirect()->to('/structures')
+                ->withInput()
+                ->with('error', 'Impossible de creer la structure.');
+        }
+
+        return redirect()->to('/structures')
+            ->with('swal_success', 'Structure ajoutée avec succès.');
     }
 
     /**
@@ -215,5 +284,15 @@ class C_StructureController extends BaseController
             'success' => true,
             'data' => $data
         ]);
+    }
+
+    /**
+     * Normalise une valeur décimale optionnelle.
+     */
+    private function normalizeDecimal($value): ?string
+    {
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 }

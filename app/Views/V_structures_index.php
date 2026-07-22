@@ -43,8 +43,8 @@
             background: linear-gradient(135deg, #0f4c5c 0%, #177e89 50%, #27a8b8 100%);
         }
 
-        .structure-modal .modal-header.modal-header-warning {
-            background: linear-gradient(135deg, #9a3412 0%, #d97706 48%, #f59e0b 100%);
+        .structure-modal .modal-header.modal-header-edit {
+            background: linear-gradient(135deg, #15355f 0%, #1d6697 52%, #29a0c9 100%);
         }
 
         .structure-modal .modal-header.modal-header-danger {
@@ -233,6 +233,19 @@
     <div class="content-page">
         <div class="content">
             <div class="container-fluid mt-4">
+                <?php if (session()->getFlashdata('success')): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?= esc(session()->getFlashdata('success')) ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (session()->getFlashdata('error')): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?= esc(session()->getFlashdata('error')) ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                <?php endif; ?>
         <div class="row">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -286,7 +299,7 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
-                                <thead class="table-dark">
+                                <thead class="table-primary">
                                     <tr>
                                         <th>Code</th>
                                         <th>Nom</th>
@@ -318,13 +331,13 @@
                                             <td><?= esc($structure['nombre_classes']) ?></td>
                                             <td><?= date('d/m/Y', strtotime($structure['created_at'])) ?></td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-info me-1 structure-action-btn" data-bs-toggle="modal" data-bs-target="#viewStructureModal" onclick="loadStructureView(<?= $structure['id'] ?>)" title="Voir detail">
+                                                <button type="button" class="btn btn-sm btn-outline-success me-1 structure-action-btn" data-bs-toggle="modal" data-bs-target="#viewStructureModal" onclick="loadStructureView(<?= $structure['id'] ?>)" title="Voir detail">
                                                     <i class="fa fa-eye"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-warning me-1 structure-action-btn" data-bs-toggle="modal" data-bs-target="#editStructureModal" onclick="loadStructureEdit(<?= $structure['id'] ?>)" title="Modifier">
+                                                <button type="button" class="btn btn-sm btn-outline-primary me-1 structure-action-btn" data-bs-toggle="modal" data-bs-target="#editStructureModal" onclick="loadStructureEdit(<?= $structure['id'] ?>)" title="Modifier">
                                                     <i class="fa fa-edit"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-danger structure-action-btn" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteId(<?= $structure['id'] ?>)" title="Supprimer">
+                                                <button type="button" class="btn btn-sm btn-outline-danger structure-action-btn" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" onclick="setDeleteId(<?= $structure['id'] ?>)" title="Supprimer">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </td>
@@ -491,7 +504,7 @@
                     <p class="footer-note">La fiche affiche les informations operateur, statut, localisation et dates systeme.</p>
                     <div class="footer-actions">
                         <button type="button" class="btn btn-outline-secondary btn-footer" data-bs-dismiss="modal">Fermer</button>
-                        <button type="button" class="btn btn-warning btn-footer" id="editFromViewBtn" onclick="editFromView()">Modifier</button>
+                        <button type="button" class="btn btn-primary btn-footer" id="editFromViewBtn" onclick="editFromView()">Modifier</button>
                     </div>
                 </div>
             </div>
@@ -503,7 +516,7 @@
             <div class="modal-content">
                 <form method="post" id="editStructureForm" class="structure-form">
                     <?= csrf_field() ?>
-                    <div class="modal-header modal-header-warning text-white">
+                    <div class="modal-header modal-header-edit text-white">
                         <div class="modal-title-wrap">
                             <span class="modal-title-icon"><i class="fa fa-edit"></i></span>
                             <div>
@@ -516,7 +529,7 @@
 
                     <div class="modal-body" id="editModalContent">
                         <div class="text-center">
-                            <div class="spinner-border text-warning" role="status">
+                            <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Chargement...</span>
                             </div>
                         </div>
@@ -526,7 +539,7 @@
                         <p class="footer-note">Les modifications sont appliquees a la structure selectionnee.</p>
                         <div class="footer-actions">
                             <button type="button" class="btn btn-outline-secondary btn-footer" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-warning btn-footer">Mettre a jour</button>
+                            <button type="submit" class="btn btn-primary btn-footer">Mettre a jour</button>
                         </div>
                     </div>
                 </form>
@@ -541,8 +554,8 @@
                     <div class="modal-title-wrap">
                             <span class="modal-title-icon"><i class="fa fa-exclamation-triangle"></i></span>
                         <div>
-                            <h5 class="modal-title mb-1">Confirmer la suppression</h5>
-                            <p class="modal-subtitle">Cette action retire la structure de la liste active.</p>
+                            <h5 class="modal-title mb-1 text-white">Confirmer la suppression</h5>
+                            <p class="modal-subtitle"></p>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -551,12 +564,12 @@
                 <div class="modal-body">
                     <p class="mb-0">
                         <i class="fa fa-info-circle text-warning me-2"></i>
-                        Etes-vous sur de vouloir supprimer cette structure ? Cette action ne peut pas etre annulee.
+                        Etes-vous sur de vouloir supprimer cette structure ?  
                     </p>
                 </div>
 
                 <div class="modal-footer">
-                    <p class="footer-note">Verification recommandee avant suppression definitive.</p>
+                    <p class="footer-note"></p>
                     <div class="footer-actions">
                         <button type="button" class="btn btn-outline-secondary btn-footer" data-bs-dismiss="modal">Annuler</button>
                         <button type="button" class="btn btn-danger btn-footer" id="confirmDeleteBtn" onclick="confirmDelete()">Supprimer</button>
@@ -740,7 +753,7 @@
         function loadStructureEdit(id) {
             currentStructureId = id;
             const modalContent = document.getElementById('editModalContent');
-            modalContent.innerHTML = '<div class="text-center"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Chargement...</span></div></div>';
+            modalContent.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div></div>';
 
             fetch(`<?= base_url('structures/api/get/') ?>${id}`)
                 .then(response => response.json())
@@ -876,7 +889,7 @@
 
         function confirmDelete() {
             if (deleteStructureId) {
-                window.location.href = `<?= base_url('structures/delete/') ?>${deleteStructureId}`;
+                submitPostAction(`<?= base_url('structures/delete/') ?>${deleteStructureId}`);
             }
         }
     </script>

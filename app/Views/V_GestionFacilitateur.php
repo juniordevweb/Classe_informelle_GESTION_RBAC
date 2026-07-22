@@ -246,6 +246,7 @@ $showFacilitateurActionsColumn = $canEditFacilitateur || $canDeleteFacilitateur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg rounded-4">
             <form method="post" action="<?= base_url('facilitateur/save') ?>">
+                <?= csrf_field() ?>
                 <div class="modal-header text-white border-0 rounded-top">
                     <div class="modal-title-wrap">
                         <div class="modal-title-icon">
@@ -382,6 +383,7 @@ $showFacilitateurActionsColumn = $canEditFacilitateur || $canDeleteFacilitateur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg rounded-4">
             <form method="post" action="<?= base_url('facilitateur/update') ?>">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" id="edit_id">
                 <div class="modal-header text-white border-0 rounded-top">
                     <div class="modal-title-wrap">
@@ -582,8 +584,8 @@ $showFacilitateurActionsColumn = $canEditFacilitateur || $canDeleteFacilitateur;
                         confirmButtonText: 'Oui, supprimer',
                         cancelButtonText: 'Annuler'
                     }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = "<?= base_url('facilitateur/delete/') ?>" + id;
+                    if (result.isConfirmed) {
+                            submitPostAction("<?= base_url('facilitateur/delete/') ?>" + id);
                         }
                     });
                 });

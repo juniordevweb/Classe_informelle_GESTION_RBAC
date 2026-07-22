@@ -230,6 +230,35 @@ if (! function_exists('getSidebarMenus')) {
     }
 }
 
+if (! function_exists('getDefaultLandingUrl')) {
+    function getDefaultLandingUrl(array $permissions = [], string $fallback = '/dashboard'): string
+    {
+        $navigation = getSidebarMenus($permissions);
+
+        $findFirstUrl = static function (array $items) use (&$findFirstUrl): ?string {
+            foreach ($items as $item) {
+                $url = trim((string) ($item['url'] ?? ''));
+
+                if ($url !== '') {
+                    return '/' . ltrim($url, '/');
+                }
+
+                if (! empty($item['children']) && is_array($item['children'])) {
+                    $childUrl = $findFirstUrl($item['children']);
+
+                    if ($childUrl !== null) {
+                        return $childUrl;
+                    }
+                }
+            }
+
+            return null;
+        };
+
+        return $findFirstUrl($navigation) ?? $fallback;
+    }
+}
+
 if (! function_exists('registerDynamicMenuRoutes')) {
     function registerDynamicMenuRoutes(RouteCollection $routes, array $reservedPaths = []): void
     {

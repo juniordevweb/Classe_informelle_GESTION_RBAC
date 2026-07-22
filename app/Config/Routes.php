@@ -10,10 +10,13 @@ $routes->get('/', 'Home::index');
 // LOGIN
 $routes->get('login', 'C_AuthController::login');
 $routes->post('login/process', 'C_AuthController::process');
-$routes->get('logout', 'C_AuthController::logout');
+$routes->post('logout', 'C_AuthController::logout');
 
 // ROUTES PROTEGEES
 $routes->group('', ['filter' => 'auth'], function ($routes) {
+    $routes->get('password/reset', 'C_AuthController::passwordReset');
+    $routes->post('password/reset', 'C_AuthController::passwordResetProcess');
+
     // Dashboard
     $routes->get('dashboard', 'C_DashboardController::index', ['filter' => 'permission:1,1,1']);
 
@@ -21,19 +24,19 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('facilitateur', 'C_FacilitateurController::index', ['filter' => 'permission:2,2,1']);
     $routes->post('facilitateur/save', 'C_FacilitateurController::save', ['filter' => 'permission:2,2,2']);
     $routes->post('facilitateur/update', 'C_FacilitateurController::update', ['filter' => 'permission:2,2,3']);
-    $routes->get('facilitateur/delete/(:num)', 'C_FacilitateurController::delete/$1', ['filter' => 'permission:2,2,4']);
+    $routes->post('facilitateur/delete/(:num)', 'C_FacilitateurController::delete/$1', ['filter' => 'permission:2,2,4']);
 
     // Superviseurs
     $routes->get('superviseur', 'C_SuperviseurController::index', ['filter' => 'permission:3,3,1']);
     $routes->post('superviseur/save', 'C_SuperviseurController::save', ['filter' => 'permission:3,3,2']);
     $routes->post('superviseur/update', 'C_SuperviseurController::update', ['filter' => 'permission:3,3,3']);
-    $routes->get('superviseur/delete/(:num)', 'C_SuperviseurController::delete/$1', ['filter' => 'permission:3,3,4']);
+    $routes->post('superviseur/delete/(:num)', 'C_SuperviseurController::delete/$1', ['filter' => 'permission:3,3,4']);
 
     // Operateurs
     $routes->get('operateur', 'C_OperateurController::index', ['filter' => 'permission:4,4,1']);
     $routes->post('operateur/save', 'C_OperateurController::save', ['filter' => 'permission:4,4,2']);
     $routes->post('operateur/update', 'C_OperateurController::update', ['filter' => 'permission:4,4,3']);
-    $routes->get('operateur/delete/(:num)', 'C_OperateurController::delete/$1', ['filter' => 'permission:4,4,4']);
+    $routes->post('operateur/delete/(:num)', 'C_OperateurController::delete/$1', ['filter' => 'permission:4,4,4']);
 
     // Apprenant
     $routes->get('apprenant', 'C_ApprenantController::index', ['filter' => 'permission:5,13,1']);
@@ -41,27 +44,28 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('apprenant/update', 'C_ApprenantController::update', ['filter' => 'permission:5,13,3']);
     $routes->post('apprenant/notes/save', 'C_ApprenantController::saveNote', ['filter' => 'permission:5,13,3']);
     $routes->post('apprenant/notes/delete', 'C_ApprenantController::deleteNote', ['filter' => 'permission:5,13,3']);
-    $routes->get('apprenant/delete/(:num)', 'C_ApprenantController::delete/$1', ['filter' => 'permission:5,13,4']);
+    $routes->post('apprenant/delete/(:num)', 'C_ApprenantController::delete/$1', ['filter' => 'permission:5,13,4']);
 
     // Classes
     $routes->get('classes', 'C_ClasseController::index', ['filter' => 'permission:7,14,1']);
     $routes->post('classes/save', 'C_ClasseController::save', ['filter' => 'permission:7,14,2']);
     $routes->post('classes/update', 'C_ClasseController::update', ['filter' => 'permission:7,14,3']);
-    $routes->get('classes/delete/(:num)', 'C_ClasseController::delete/$1', ['filter' => 'permission:7,14,4']);
+    $routes->post('classes/delete/(:num)', 'C_ClasseController::delete/$1', ['filter' => 'permission:7,14,4']);
 
     // Structures
-    $routes->get('structures', 'C_StructureController::index', ['filter' => 'auth']);
-    $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'auth']);
-    $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'auth']);
-    $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'auth']);
-    $routes->get('structures/delete/(:num)', 'C_StructureController::destroy/$1', ['filter' => 'auth']);
-    $routes->get('structures/api/get/(:num)', 'C_StructureController::apiGet/$1', ['filter' => 'auth']);
+    $routes->get('structures', 'C_StructureController::index', ['filter' => 'permission:6,15,1']);
+    $routes->post('structures/store', 'C_StructureController::store', ['filter' => 'permission:6,15,2']);
+    $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'permission:6,15,1']);
+    $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'permission:6,15,3']);
+    $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'permission:6,15,3']);
+    $routes->post('structures/delete/(:num)', 'C_StructureController::destroy/$1', ['filter' => 'permission:6,15,4']);
+    $routes->get('structures/api/get/(:num)', 'C_StructureController::apiGet/$1', ['filter' => 'permission:6,15,1']);
 
     // Users
     $routes->get('users', 'C_UserController::index', ['filter' => 'permission:6,6,1']);
     $routes->post('users/save_user', 'C_UserController::save_user', ['filter' => 'permission:6,6,2']);
-    $routes->get('users/block/(:num)', 'C_UserController::block/$1', ['filter' => 'permission:6,6,3']);
-    $routes->get('users/delete/(:num)', 'C_UserController::delete/$1', ['filter' => 'permission:6,6,4']);
+    $routes->post('users/block/(:num)', 'C_UserController::block/$1', ['filter' => 'permission:6,6,3']);
+    $routes->post('users/delete/(:num)', 'C_UserController::delete/$1', ['filter' => 'permission:6,6,4']);
     $routes->post('users/update', 'C_UserController::update', ['filter' => 'permission:6,6,3']);
 
 
@@ -83,7 +87,7 @@ $routes->get('users/search-personnel', 'C_UserController::search_personnel');
     $routes->get('profils', 'C_ProfilController::index', ['filter' => 'permission:6,6,1']);
     $routes->get('profils/get/(:num)', 'C_ProfilController::getProfil/$1', ['filter' => 'permission:6,6,1']);
     $routes->post('profils/update', 'C_ProfilController::update', ['filter' => 'permission:6,6,3']);
-    $routes->get('profils/delete/(:num)', 'C_ProfilController::delete/$1', ['filter' => 'permission:6,6,4']);
+    $routes->post('profils/delete/(:num)', 'C_ProfilController::delete/$1', ['filter' => 'permission:6,6,4']);
     $routes->post('profils/delete_ajax/(:num)', 'C_ProfilController::delete_ajax/$1', ['filter' => 'permission:6,6,4']);
     $routes->post('profils/save', 'C_ProfilController::save', ['filter' => 'permission:6,6,2']);
     $routes->get('profils/getProfil/(:num)', 'Profils::getProfil/$1', ['filter' => 'permission:6,6,1']);
@@ -101,6 +105,7 @@ $routes->get('users/search-personnel', 'C_UserController::search_personnel');
             'users/search-personnel',
             'menus',
             'profils',
+            'password/reset',
             'login',
             'logout',
         ]);

@@ -59,6 +59,7 @@ class UserInvitationService
             'email' => $emailAddress,
             'password' => $plainPassword,
             'loginUrl' => base_url('login'),
+            'resetNote' => 'Lors de votre premiere connexion, vous devrez remplacer ce mot de passe temporaire par un mot de passe personnel.',
             'welcomeMessage' => sprintf(
                 'Votre compte a été créé sur %s. Vous pouvez maintenant vous connecter avec les informations ci-dessous.',
                 $appName

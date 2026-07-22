@@ -153,8 +153,14 @@ $directMenuRoutes = [
                                     <font _mstmutation="1" _msttexthash="156065" _msthidden="1" _msthash="20"> Lock
                                         screen</font>
                                 </a></li>
-                            <li><a href="<?= base_url('logout') ?>" class="dropdown-item"><i
-                                        class="md md-settings-power mr-2"></i> Logout</a></li>
+                            <li>
+                                <form method="post" action="<?= base_url('logout') ?>" class="m-0">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="md md-settings-power mr-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
                         </ul>
                     </div>
 
@@ -223,10 +229,13 @@ $directMenuRoutes = [
             </div>
 
             <div class="sidebar-logout-wrap">
-                <a href="<?= base_url('logout') ?>" class="sidebar-logout-btn">
-                    <i class="md md-settings-power"></i>
-                    <span>Deconnexion</span>
-                </a>
+                <form method="post" action="<?= base_url('logout') ?>" class="m-0">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="sidebar-logout-btn border-0">
+                        <i class="md md-settings-power"></i>
+                        <span>Deconnexion</span>
+                    </button>
+                </form>
             </div>
         </div>
         <div class="slimScrollBar"

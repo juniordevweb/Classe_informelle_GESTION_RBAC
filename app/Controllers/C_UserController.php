@@ -245,6 +245,10 @@ class C_UserController extends BaseController
             $userData['status'] = 1;
         }
 
+        if ($this->hasColumn('must_change_password')) {
+            $userData['must_change_password'] = 1;
+        }
+
         try {
             $result = $this->userModel->insert($userData, true);
 
@@ -324,8 +328,6 @@ class C_UserController extends BaseController
             ->with('success_delete', 'Utilisateur supprimé avec succès !');
     }
 
-//PUBLIC FUNCTION GETALLNAMEBYROLEID($role_id)
-//    {
 
     public function update()
     {
@@ -341,6 +343,19 @@ class C_UserController extends BaseController
 
         return redirect()->to('/users')
             ->with('success_update', 'Utilisateur modifié avec succès !');
+    }
+
+    public function VerifyAdmin()
+    {
+        $userId = $this->request->getPost('user_id');
+        $isAdmin = $this->request->getPost('is_admin') === '1';
+
+        $this->userModel->update($userId, [
+            'is_admin' => $isAdmin,
+        ]);
+
+        return redirect()->to('/users')
+            ->with('success_update', 'Droits administrateur mis à jour avec succès !');
     }
 }
 // End of C_UserController.php -- so diangoul do am--vso amoul niou yapp la-- sougn la yabbé gua niak fayda

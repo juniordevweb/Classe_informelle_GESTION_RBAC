@@ -2,6 +2,12 @@
 <?= $this->include('templates/top_bar') ?>
 <?= $this->include('templates/left_sidebar') ?>
 
+<style>
+    .modal .modal-header {
+        background: linear-gradient(135deg, #113564 0%, #1f5faa 55%, #2d7be0 100%) !important;
+    }
+</style>
+
 <?php
 $user_permissions = $user_permissions ?? [];
 $classes = $classes ?? [];
@@ -100,7 +106,7 @@ $showActionsColumn = $canEditClasse || $canDeleteClasse;
                                         <td><?= esc(getLabel($facilitateurs, $classe['facilitateur_id'], '-')) ?></td>
                                         <td class="text-nowrap">
                                             <?php if ($canEditClasse): ?>
-                                                <button class="btn btn-sm btn-outline-secondary me-1 editClasseBtn"
+                                                <button class="btn btn-sm btn-outline-primary me-1 editClasseBtn"
                                                     data-id="<?= esc($classe['id'], 'attr') ?>"
                                                     data-nom_classe="<?= esc($classe['nom_classe'], 'attr') ?>"
                                                     data-code_classe="<?= esc($classe['code_classe'], 'attr') ?>"
@@ -143,8 +149,9 @@ $showActionsColumn = $canEditClasse || $canDeleteClasse;
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-4">
             <form method="post" action="<?= base_url('classes/save') ?>">
+                <?= csrf_field() ?>
                 <div class="modal-header bg-gradient-primary text-white border-0 rounded-top">
-                    <h5 class="modal-title"><i class="fa fa-plus me-2"></i> Créer une classe</h5>
+                    <h5 class="modal-title text-white"><i class="fa fa-plus me-2"></i>Ajouter une classe</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -209,6 +216,7 @@ $showActionsColumn = $canEditClasse || $canDeleteClasse;
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-4">
             <form method="post" action="<?= base_url('classes/update') ?>">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" id="edit_classe_id">
 
                 <div class="modal-header bg-gradient-warning text-white border-0 rounded-top">
@@ -299,7 +307,7 @@ $showActionsColumn = $canEditClasse || $canDeleteClasse;
                     return;
                 }
 
-                window.location.href = '<?= base_url('classes/delete/') ?>' + id;
+                submitPostAction('<?= base_url('classes/delete/') ?>' + id);
             });
         });
     });

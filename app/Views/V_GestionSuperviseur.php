@@ -222,12 +222,13 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="post" action="<?= base_url('superviseur/save') ?>" class="superviseur-form">
+                <?= csrf_field() ?>
                 <div class="modal-header text-white">
                     <div class="modal-title-wrap">
                         <span class="modal-title-icon"><i class="fa fa-id-badge"></i></span>
                         <div>
                             <h5 class="modal-title mb-1">Ajouter un superviseur</h5>
-                            <p class="modal-subtitle">Completez les informations personnelles, l'affectation et les acces du superviseur.</p>
+                            <p class="modal-subtitle">Completez les informations personnelles et l'affectation du superviseur.</p>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -279,24 +280,6 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                             </div>
                         </div>
                     </div>
-                    <div class="card section-card border-0">
-                        <div class="card-header">
-                            <h6 class="section-title">Acces et statut</h6>
-                            <p class="section-description">Configurez l'acces et l'etat du compte superviseur.</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label">Mot de passe</label><input type="password" name="password" class="form-control" required></div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Statut</label>
-                                    <select name="statut" class="form-select" required>
-                                        <option value="actif" <?= old('statut', 'actif') === 'actif' ? 'selected' : '' ?>>Actif</option>
-                                        <option value="inactif" <?= old('statut') === 'inactif' ? 'selected' : '' ?>>Inactif</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <p class="footer-note">Le pied de page reste visible pour garder les actions accessibles meme sur un long formulaire.</p>
@@ -316,7 +299,10 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="post" action="<?= base_url('superviseur/update') ?>" class="superviseur-form">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" id="edit_superviseur_id">
+                <input type="hidden" name="password" id="edit_password" value="">
+                <input type="hidden" name="statut" id="edit_statut" value="actif">
                 <div class="modal-header text-white">
                     <div class="modal-title-wrap">
                         <span class="modal-title-icon"><i class="fa fa-edit"></i></span>
@@ -369,24 +355,6 @@ $showSuperviseurActionsColumn = $canEditSuperviseur || $canDeleteSuperviseur;
                                 <div class="col-md-4"><label class="form-label">Date affectation</label><input type="date" name="date_affectation" id="edit_date_affectation" class="form-control" required></div>
                                 <div class="col-md-6"><label class="form-label">Region</label><input type="text" name="region" id="edit_region" class="form-control" required></div>
                                 <div class="col-md-6"><label class="form-label">Departement</label><input type="text" name="departement" id="edit_departement" class="form-control" required></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card section-card border-0">
-                        <div class="card-header">
-                            <h6 class="section-title">Acces et statut</h6>
-                            <p class="section-description">Si le mot de passe est vide, le mot de passe actuel est conserve.</p>
-                        </div>
-                        <div class="card-body">
-                            <div class="row g-3">
-                                <div class="col-md-6"><label class="form-label">Nouveau mot de passe</label><input type="password" name="password" id="edit_password" class="form-control" placeholder="Laisser vide pour conserver"></div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Statut</label>
-                                    <select name="statut" id="edit_statut" class="form-select" required>
-                                        <option value="actif">Actif</option>
-                                        <option value="inactif">Inactif</option>
-                                    </select>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -448,21 +416,21 @@ document.addEventListener('DOMContentLoaded', function () {
             button.addEventListener('click', function () {
                 const id = this.dataset.id;
                 const nom = this.dataset.nom || 'ce superviseur';
-                Swal.fire({
-                    title: 'Supprimer superviseur ?',
-                    html: "Cette action est irreversible.<br><strong>" + nom + "</strong>",
-                    icon: 'warning',
+                    Swal.fire({
+                        title: 'Supprimer superviseur ?',
+                        html: "Cette action est irreversible.<br><strong>" + nom + "</strong>",
+                        icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Oui, supprimer',
                     cancelButtonText: 'Annuler',
                     confirmButtonColor: '#dc3545'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "<?= base_url('superviseur/delete/') ?>" + id;
-                    }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                        submitPostAction("<?= base_url('superviseur/delete/') ?>" + id);
+                        }
+                    });
                 });
             });
-        });
     <?php endif; ?>
 });
 </script>

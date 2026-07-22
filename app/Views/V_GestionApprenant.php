@@ -2,6 +2,12 @@
 <?= $this->include('templates/top_bar') ?>
 <?= $this->include('templates/left_sidebar') ?>
 
+<style>
+    .modal .modal-header {
+        background: linear-gradient(135deg, #113564 0%, #1f5faa 55%, #2d7be0 100%) !important;
+    }
+</style>
+
 <?php
 $user_permissions = $user_permissions ?? [];
 $performances = $performances ?? [];
@@ -25,14 +31,14 @@ function getPerformanceBadgeClass(string $decision): string
     <div class="container mt-4">
         <br><br><br>
 
-        <div class="d-flex justify-content-between align-items-start mb-4">
+        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
             <div>
                 <h3 class="mb-2">Performances des apprenants</h3>
                 <p class="text-muted mb-0">Gestion des apprenants et performances.</p>
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addApprenantModal">
-                    <i class="fa fa-plus me-1"></i> Ajouter apprenant
+                    <i class="fa fa-plus me-1 btn btn-primary"></i> Ajouter apprenant
                 </button>
             </div>
         </div>
@@ -166,8 +172,8 @@ function getPerformanceBadgeClass(string $decision): string
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content shadow-lg rounded-4">
             <form method="post" action="<?= base_url('apprenant/save') ?>">
-                <div class="modal-header bg-gradient-primary text-white border-0 rounded-top">
-                    <h5 class="modal-title"><i class="fa fa-plus me-2"></i> Ajouter apprenant</h5>
+                <div class="modal-header  text-white border-0 rounded-top">
+                    <h5 class="modal-title text-white"><i class="fa fa-plus me-2"></i><b> Ajouter apprenant </b> </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -411,7 +417,7 @@ function getPerformanceBadgeClass(string $decision): string
                 if (!confirm('Supprimer cet apprenant ?')) {
                     return;
                 }
-                window.location.href = '<?= base_url('apprenant/delete') ?>/' + this.dataset.id;
+                submitPostAction('<?= base_url('apprenant/delete') ?>/' + this.dataset.id);
             });
         });
 

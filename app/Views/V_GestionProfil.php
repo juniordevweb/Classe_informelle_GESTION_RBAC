@@ -102,6 +102,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
     <div class="modal-dialog modal-xl">
         <div class="modal-content shadow">
             <form method="post" action="<?= base_url('profils/save') ?>">
+                <?= csrf_field() ?>
                 <div class="modal-header text-white">
                     <h5 class="modal-title"><i class="fa fa-user-plus me-2"></i> Ajouter Profil</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
@@ -178,6 +179,7 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
     <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content shadow-lg border-0 rounded-4">
             <form method="post" action="<?= base_url('profils/update') ?>">
+                <?= csrf_field() ?>
                 <input type="hidden" name="role_id" id="edit_role_id">
                 <div class="modal-header bg-gradient-warning text-white">
                     <h5 class="modal-title fw-bold"><i class="fa fa-edit me-2"></i> Modifier Profil</h5>
@@ -486,28 +488,31 @@ syncAddSelectedPermissions();
             const id = this.dataset.id;
             const nom = this.dataset.nom;
 
-            Swal.fire({
-                title: 'Supprimer ?',
-                html: `Voulez-vous vraiment supprimer : <br><strong>${nom}</strong> ?`,
-                icon: 'warning',
+                    Swal.fire({
+                        title: 'Supprimer ?',
+                        html: `Voulez-vous vraiment supprimer : <br><strong>${nom}</strong> ?`,
+                        icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Oui, supprimer', 
                 cancelButtonText: 'Annuler'
-            }).then(result => {
-                if(result.isConfirmed){
-                    fetch("<?= base_url('profils/delete_ajax') ?>/"+id, {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    }).then(res => res.json())
-                    .then(data => {
-                        if(data.status === 'success'){
-                            Swal.fire('Supprimé !', data.message, 'success');
-                            this.closest('tr').remove();
-                        } else {
-                            Swal.fire('Erreur', data.message, 'error');
-                        }
+                    }).then(result => {
+                        if(result.isConfirmed){
+                            fetch("<?= base_url('profils/delete_ajax') ?>/"+id, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    [CSRF_TOKEN_NAME]: CSRF_TOKEN_HASH
+                                }
+                            }).then(res => res.json())
+                            .then(data => {
+                                if(data.status === 'success'){
+                                    Swal.fire('Supprimé !', data.message, 'success');
+                                    window.location.reload();
+                                } else {
+                                    Swal.fire('Erreur', data.message, 'error');
+                                }
                     }).catch(() => Swal.fire('Erreur', 'Une erreur est survenue', 'error'));
                 }
             });

@@ -103,7 +103,7 @@ $flashError = session()->getFlashdata('error');
             <div class="card-header text-white d-flex justify-content-between align-items-center">
                 <div>
                     <h4 class="mb-0">
-                        <i class="fa fa-sitemap me-2"></i> Gestion des menus
+                        <i class="fa fa-sitemap me-2  "></i> <b class="text-white">Gestion des menus</b>
                     </h4>
                     <small class="text-white-50">Administration des menus principaux et des sous-menus</small>
                 </div>
@@ -309,7 +309,7 @@ $flashError = session()->getFlashdata('error');
             <form method="post" action="<?= base_url('menus/save-menu') ?>">
                 <?= csrf_field() ?>
                 <div class="modal-header text-white" style="background: linear-gradient(135deg,#0d6efd,#0a58ca);">
-                    <h5 class="modal-title">Ajouter un menu</h5>
+                    <h5 class="modal-title ">Ajouter un menu</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">

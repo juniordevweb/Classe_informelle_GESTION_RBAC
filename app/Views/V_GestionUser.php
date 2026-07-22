@@ -88,7 +88,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
 
         <br><br><br>
 
-        <div class="d-flex justify-content-between mb-4">
+        <div class="d-flex justify-content-between mb-4 ">
             <h3>Gestion des Utilisateurs</h3>
 
             <?php if ($canAddUser): ?>
@@ -134,7 +134,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                             <td class="text-center">
 
                                 <?php if ($canEditUser): ?>
-                                    <button class="btn btn-warning btn-sm blockBtn"
+                                    <button class="btn btn-outline-success btn-sm blockBtn"
                                             data-id="<?= esc($user['id']) ?>"
                                             data-nom="<?= esc($user['nom']) ?>"
                                             title="Bloquer">
@@ -143,7 +143,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                 <?php endif; ?>
 
                                 <?php if ($canEditUser): ?>
-                                    <button class="btn btn-info btn-sm editBtn"
+                                    <button class="btn btn-outline-primary btn-sm editBtn"
                                             data-id="<?= esc($user['id']) ?>"
                                             data-nom="<?= esc($user['nom']) ?>"
                                             data-email="<?= esc($user['email']) ?>"
@@ -154,7 +154,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                 <?php endif; ?>
 
                                 <?php if ($canDeleteUser): ?>
-                                    <button class="btn btn-danger btn-sm deleteBtn"
+                                    <button class="btn btn-outline-danger btn-sm deleteBtn"
                                             data-id="<?= esc($user['id']) ?>"
                                             data-nom="<?= esc($user['nom']) ?>"
                                             title="Supprimer">
@@ -450,7 +450,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                                 <i class="fa fa-lock text-primary"></i>
                                             </span>
 
-                                            <input type="text"
+                                            <input type="password"
                                                    name="password"
                                                    class="form-control"
                                                    id="userPassword"
@@ -468,7 +468,7 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                                         </div>
 
                                         <small class="text-muted">
-                                            Un mot de passe sécurisé est généré automatiquement.
+                                            .
                                         </small>
 
                                     </div>
@@ -723,7 +723,7 @@ document.querySelectorAll('.blockBtn').forEach(button => {
             confirmButtonText: 'Oui, bloquer'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "<?= base_url('users/block/') ?>" + id;
+                submitPostAction("<?= base_url('users/block/') ?>" + id);
             }
         });
 
@@ -749,7 +749,7 @@ document.querySelectorAll('.deleteBtn').forEach(button => {
             confirmButtonText: 'Oui, supprimer'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = "<?= base_url('users/delete/') ?>" + id;
+                submitPostAction("<?= base_url('users/delete/') ?>" + id);
             }
         });
 

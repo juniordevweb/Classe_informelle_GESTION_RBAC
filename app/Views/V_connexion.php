@@ -25,8 +25,13 @@
                 <h3 class="text-center m-t-10 text-white"><strong>Connexion</strong></h3>
             </div>
 
-            <?php if (session()->getFlashdata('error')): ?>
-                <p style="color:red"><?= session()->getFlashdata('error') ?></p>
+            <?php
+            $loginError = session()->getFlashdata('error');
+            $loginSuccess = session()->getFlashdata('success');
+            ?>
+
+            <?php if ($loginError): ?>
+                <div class="alert alert-danger mx-3 mt-3 mb-0"><?= esc($loginError) ?></div>
             <?php endif; ?>
 
             <div class="card-body">
@@ -75,24 +80,24 @@
     <script src="<?= base_url('assets/js/jquery.app.js') ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <?php if (session()->getFlashdata('error')): ?>
+    <?php if ($loginError): ?>
         <script>
             Swal.fire({
                 icon: 'error',
                 title: 'Erreur',
-                text: "<?= session()->getFlashdata('error') ?>",
+                text: <?= json_encode($loginError) ?>,
                 timer: 2500,
                 showConfirmButton: false
             });
         </script>
     <?php endif; ?>
 
-    <?php if (session()->getFlashdata('success')): ?>
+    <?php if ($loginSuccess): ?>
         <script>
             Swal.fire({
                 icon: 'success',
                 title: 'SuccÃ¨s',
-                text: "<?= session()->getFlashdata('success') ?>",
+                text: <?= json_encode($loginSuccess) ?>,
                 timer: 2500,
                 showConfirmButton: false
             });

@@ -143,8 +143,8 @@ class C_SuperviseurController extends BaseController
             'departement' => 'required|max_length[100]',
             'date_affectation' => 'required|valid_date[Y-m-d]',
             'login' => $isCreate ? 'required|max_length[100]|is_unique[superviseur.login]' : 'required|max_length[100]',
-            'password' => $isCreate ? 'required|min_length[6]|max_length[255]' : 'permit_empty|min_length[6]|max_length[255]',
-            'statut' => 'required|in_list[actif,inactif]',
+            'password' => $isCreate ? 'permit_empty|min_length[6]|max_length[255]' : 'permit_empty|min_length[6]|max_length[255]',
+            'statut' => $isCreate ? 'permit_empty|in_list[actif,inactif]' : 'required|in_list[actif,inactif]',
         ];
     }
 
@@ -152,9 +152,11 @@ class C_SuperviseurController extends BaseController
     {
         $password = trim((string) $this->request->getPost('password'));
         $login = $this->resolveLoginFromRequest($existing);
+        $matricule = trim((string) $this->request->getPost('matricule'));
+        $statut = trim((string) $this->request->getPost('statut'));
 
         $payload = [
-            'matricule' => trim((string) $this->request->getPost('matricule')),
+            'matricule' => $matricule,
             'prenom' => trim((string) $this->request->getPost('prenom')),
             'nom' => trim((string) $this->request->getPost('nom')),
             'sexe' => $this->request->getPost('sexe'),
@@ -166,8 +168,12 @@ class C_SuperviseurController extends BaseController
             'departement' => trim((string) $this->request->getPost('departement')),
             'date_affectation' => $this->request->getPost('date_affectation'),
             'login' => $login,
-            'statut' => $this->request->getPost('statut'),
+            'statut' => $statut !== '' ? $statut : 'actif',
         ];
+
+        if ($password === '' && $isCreate) {
+            $password = $matricule !== '' ? $matricule : $login;
+        }
 
         if ($password !== '') {
             $payload['password'] = password_hash($password, PASSWORD_DEFAULT);

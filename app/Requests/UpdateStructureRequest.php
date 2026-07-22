@@ -31,7 +31,7 @@ class UpdateStructureRequest
             'latitude' => 'permit_empty|decimal',
             'longitude' => 'permit_empty|decimal',
             'langue_nationale' => 'required|max_length[255]',
-            'operateur_id' => 'required|integer|is_not_unique[operateurs.id]',
+            'operateur_id' => 'required|integer|is_not_unique[operateur.id]',
             'etat' => 'required|in_list[EN_ATTENTE,VALIDE,OUVERT,FERME,GELE]',
         ];
     }

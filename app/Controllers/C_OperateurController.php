@@ -23,7 +23,7 @@ class C_OperateurController extends BaseController
         $data['user_permissions'] = $this->getUserPermissions();
         $data['operateurs'] = $this->operateurModel->orderBy('id', 'DESC')->paginate($perPage, 'operateurs');
         $data['pager'] = $this->operateurModel->pager;
-        $data['structures'] = $this->getReferenceOptions('structure');
+        $data['structures'] = $this->getReferenceOptions('structures');
 
         return view('V_GestionOperateur', $data);
     }
@@ -244,7 +244,7 @@ class C_OperateurController extends BaseController
 
     protected function buildOperateurPayload(): array
     {
-        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structure');
+        $structureId = $this->normalizeOptionalForeignKey($this->request->getPost('structure_id'), 'structures');
 
         return [
             'code_operateur' => trim((string) $this->request->getPost('code_operateur')),

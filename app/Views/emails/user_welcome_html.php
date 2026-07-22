@@ -28,6 +28,9 @@
                             <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#374151;">
                                 <?= esc($welcomeMessage) ?>
                             </p>
+                            <div style="margin:0 0 24px;padding:16px 18px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;color:#1e3a8a;font-size:14px;line-height:1.7;">
+                                <?= esc($resetNote ?? 'Lors de votre première connexion, vous devrez changer votre mot de passe.') ?>
+                            </div>
                             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;margin:0 0 24px;">
                                 <tr>
                                     <td style="padding:14px 16px;background:#f8fafc;font-weight:700;width:180px;">Nom</td>

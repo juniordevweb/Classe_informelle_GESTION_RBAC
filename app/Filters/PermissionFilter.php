@@ -62,7 +62,9 @@ class PermissionFilter implements FilterInterface
         }
 
         if (!$permission) {
-            return redirect()->back()->with('access_denied', $this->getDeniedMessage($permissionId));
+            $landingUrl = getDefaultLandingUrl($permissions, '/login');
+
+            return redirect()->to($landingUrl)->with('access_denied', $this->getDeniedMessage($permissionId));
         }
     }
 

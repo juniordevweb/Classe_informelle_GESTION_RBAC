@@ -314,11 +314,12 @@ $showOperateurActionsColumn = $canEditOperateur || $canDeleteOperateur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="post" action="<?= base_url('operateur/save') ?>" class="operateur-form">
+                <?= csrf_field() ?>
                 <div class="modal-header bg-primary text-white">
                     <div class="modal-title-wrap">
                         <span class="modal-title-icon"><i class="fa fa-building"></i></span>
                         <div>
-                            <h5 class="modal-title mb-1">Ajouter un operateur</h5>
+                            <h5 class="modal-title mb-1   ">Ajouter un operateur</h5>
                             <p class="modal-subtitle">Renseignez l'organisation, le responsable et le statut dans un seul formulaire.</p>
                         </div>
                     </div>
@@ -392,6 +393,7 @@ $showOperateurActionsColumn = $canEditOperateur || $canDeleteOperateur;
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow">
             <form method="post" action="<?= base_url('operateur/update') ?>" class="operateur-form">
+                <?= csrf_field() ?>
                 <input type="hidden" name="id" id="edit_operateur_id">
                 <div class="modal-header bg-primary text-white">
                     <div class="modal-title-wrap">
@@ -522,9 +524,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     confirmButtonText: 'Oui, supprimer',
                     cancelButtonText: 'Annuler',
                     confirmButtonColor: '#dc3545'
-                }).then((result) => {
+                    }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = "<?= base_url('operateur/delete/') ?>" + id;
+                        submitPostAction("<?= base_url('operateur/delete/') ?>" + id);
                     }
                 });
             });
