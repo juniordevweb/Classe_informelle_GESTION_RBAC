@@ -25,4 +25,9 @@ class C_ConfigurationController extends BaseController
             'referentielCounts' => $counts,
         ]);
     }
+     public function IsIdentyVerify()
+     {
+        
+     }
+ 
 }

@@ -51,12 +51,14 @@ if (! function_exists('sidebarIconClass')) {
         $map = [
             'fa fa-home' => 'md md-home',
             'fas fa-home' => 'md md-home',
-            'fa fa-user-tie' => 'md md-account',
-            'fas fa-user-tie' => 'md md-account',
+            'fa fa-user-tie' => 'md md-person',
+            'fas fa-user-tie' => 'md md-person',
             'fa fa-chalkboard-teacher' => 'md md-school',
             'fas fa-chalkboard-teacher' => 'md md-school',
             'fa fa-cogs' => 'md md-settings',
             'fas fa-cogs' => 'md md-settings',
+            'fa fa-sliders-h' => 'md md-tune',
+            'fas fa-sliders-h' => 'md md-tune',
             'fa fa-user-graduate' => 'md md-school',
             'fas fa-user-graduate' => 'md md-school',
             'fa fa-shield-alt' => 'md md-shield',
@@ -115,6 +117,7 @@ if (! function_exists('getSidebarMenus')) {
         static $subMenuCache = null;
         static $globalMenuIds = ['6'];
 
+        try {
         if ($menuCache === null) {
             $menuCache = (new M_MenuModel())
                 ->orderBy('ordre', 'ASC')
@@ -157,6 +160,10 @@ if (! function_exists('getSidebarMenus')) {
                 ->findAll();
         }
 
+        } catch (\Throwable $e) {
+            $menuCache = [];
+            $subMenuCache = [];
+        }
         $subMenusByParent = [];
 
         foreach ($subMenuCache as $subMenu) {
@@ -208,7 +215,10 @@ if (! function_exists('getSidebarMenus')) {
             }
 
             $isLeafMenu = empty($children);
-            $hasVisibleNode = $menuHasPermission || (! $requiresOwnPermission && ! $isLeafMenu);
+            // Un parent est visible dès qu'un de ses sous-menus autorisés est visible.
+            // Cela évite de masquer Paramètres lorsqu'un rôle possède uniquement
+            // les permissions d'un sous-menu et non l'ancien droit global du parent.
+            $hasVisibleNode = $menuHasPermission || ! $isLeafMenu;
 
             if (! $hasVisibleNode) {
                 continue;
@@ -220,6 +230,7 @@ if (! function_exists('getSidebarMenus')) {
 
             $menu['children'] = $children;
             $menu['is_leaf'] = $isLeafMenu;
+            $menu['can_access_url'] = $menuHasPermission;
             $navigation[] = $menu;
         }
 
@@ -237,18 +248,24 @@ if (! function_exists('getDefaultLandingUrl')) {
 
         $findFirstUrl = static function (array $items) use (&$findFirstUrl): ?string {
             foreach ($items as $item) {
-                $url = trim((string) ($item['url'] ?? ''));
-
-                if ($url !== '') {
-                    return '/' . ltrim($url, '/');
-                }
-
+                // Pour un parent, choisir d'abord un sous-menu autorisé.
                 if (! empty($item['children']) && is_array($item['children'])) {
                     $childUrl = $findFirstUrl($item['children']);
 
                     if ($childUrl !== null) {
                         return $childUrl;
                     }
+
+                    // Un parent avec des sous-menus ne doit jamais servir de
+                    // destination si aucun de ses sous-menus n'est autorisé.
+                    continue;
+                }
+
+                $url = trim((string) ($item['url'] ?? ''));
+                $canAccessUrl = (bool) ($item['can_access_url'] ?? empty($item['children']));
+
+                if ($url !== '' && $canAccessUrl) {
+                    return '/' . ltrim($url, '/');
                 }
             }
 
@@ -334,3 +351,4 @@ if (! function_exists('registerDynamicMenuRoutes')) {
         }
     }
 }
+

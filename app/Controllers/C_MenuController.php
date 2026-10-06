@@ -26,14 +26,26 @@ class C_MenuController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
-        $data['menus'] = $this->menuModel->orderBy('ordre', 'ASC')->orderBy('id', 'ASC')->findAll();
-        $data['sous_menus'] = $this->sousMenuModel
+        $menuOptions = $this->menuModel->orderBy('ordre', 'ASC')->orderBy('id', 'ASC')->findAll();
+        $allSousMenus = $this->sousMenuModel
             ->select('sous_menus.*, menus.nom_menu AS parent_menu')
             ->join('menus', 'menus.id = sous_menus.menu_id', 'left')
             ->orderBy('sous_menus.menu_id', 'ASC')
             ->orderBy('sous_menus.ordre', 'ASC')
             ->orderBy('sous_menus.id', 'ASC')
             ->findAll();
+        $data['menus'] = $this->menuModel->orderBy('ordre', 'ASC')->orderBy('id', 'ASC')->paginate(6, 'menus');
+        $data['sous_menus'] = $this->sousMenuModel
+            ->select('sous_menus.*, menus.nom_menu AS parent_menu')
+            ->join('menus', 'menus.id = sous_menus.menu_id', 'left')
+            ->orderBy('sous_menus.menu_id', 'ASC')
+            ->orderBy('sous_menus.ordre', 'ASC')
+            ->orderBy('sous_menus.id', 'ASC')
+            ->paginate(6, 'sous_menus');
+        $data['menuOptions'] = $menuOptions;
+        $data['allSousMenus'] = $allSousMenus;
+        $data['menusPager'] = $this->menuModel->pager;
+        $data['sousMenusPager'] = $this->sousMenuModel->pager;
         $data['permissions'] = $this->permissionModel->orderBy('id', 'ASC')->findAll();
 
         return view('V_GestionMenus', $data);

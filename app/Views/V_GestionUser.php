@@ -13,7 +13,10 @@ $hasUserActionPermission = static function (array $permissions, int $menuId, int
 
         if (
             (int) ($permission['menu_id'] ?? 0) === $menuId &&
-            $dbSousMenu === $sousMenuId &&
+            (
+                $dbSousMenu === $sousMenuId ||
+                ($menuId === 6 && $sousMenuId === 11 && $dbSousMenu === 6)
+            ) &&
             (int) ($permission['permission_id'] ?? 0) === $permissionId
         ) {
             return true;
@@ -23,9 +26,9 @@ $hasUserActionPermission = static function (array $permissions, int $menuId, int
     return false;
 };
 
-$canAddUser = $hasUserActionPermission($user_permissions, 6, 6, 2);
-$canEditUser = $hasUserActionPermission($user_permissions, 6, 6, 3);
-$canDeleteUser = $hasUserActionPermission($user_permissions, 6, 6, 4);
+$canAddUser = $hasUserActionPermission($user_permissions, 6, 11, 2);
+$canEditUser = $hasUserActionPermission($user_permissions, 6, 11, 3);
+$canDeleteUser = $hasUserActionPermission($user_permissions, 6, 11, 4);
 
 $showUserActionsColumn = $canEditUser || $canDeleteUser;
 ?>
@@ -168,6 +171,12 @@ $showUserActionsColumn = $canEditUser || $canDeleteUser;
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <?php if (isset($pager)): ?>
+            <div class="d-flex justify-content-center mt-3">
+                <?= $pager->simpleLinks('users', 'prev_next') ?>
+            </div>
+        <?php endif; ?>
 
     </div>
 </div>

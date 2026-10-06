@@ -18,7 +18,7 @@ class C_SuperviseurController extends BaseController
     public function index()
     {
         $this->ensureSuperviseurTable();
-        $perPage = 3;
+        $perPage = 6;
 
         $data['user_permissions'] = $this->getUserPermissions();
         $data['superviseurs'] = $this->superviseurModel->orderBy('id', 'DESC')->paginate($perPage, 'superviseurs');

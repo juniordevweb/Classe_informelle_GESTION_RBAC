@@ -28,12 +28,17 @@ class C_ProfilController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
-        $roles = $this->roleModel->findAll();
+        $roles = $this->roleModel->orderBy('id', 'DESC')->paginate(6, 'roles');
+        $data['pager'] = $this->roleModel->pager;
         $permissions = $this->permissionModel->findAll();
         $rolePermissions = $this->rolePermissionModel
             ->select('role_id, menu_id, sous_menu_id, permission_id')
             ->findAll();
-        $menus = $this->menuModel->findAll();
+        $menus = $this->menuModel
+            ->where('statut', 1)
+            ->orderBy('ordre', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->findAll();
         $permissionsByRole = [];
 
         foreach ($rolePermissions as $permission) {
@@ -43,6 +48,9 @@ class C_ProfilController extends BaseController
         foreach ($menus as &$menu) {
             $menu['sous_menus'] = $this->sousMenuModel
                 ->where('menu_id', $menu['id'])
+                ->where('statut', 1)
+                ->orderBy('ordre', 'ASC')
+                ->orderBy('id', 'ASC')
                 ->findAll();
         }
 

@@ -53,13 +53,13 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->post('classes/delete/(:num)', 'C_ClasseController::delete/$1', ['filter' => 'permission:7,14,4']);
 
     // Structures
-    $routes->get('structures', 'C_StructureController::index', ['filter' => 'permission:6,15,1']);
-    $routes->post('structures/store', 'C_StructureController::store', ['filter' => 'permission:6,15,2']);
-    $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'permission:6,15,1']);
-    $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'permission:6,15,3']);
-    $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'permission:6,15,3']);
-    $routes->post('structures/delete/(:num)', 'C_StructureController::destroy/$1', ['filter' => 'permission:6,15,4']);
-    $routes->get('structures/api/get/(:num)', 'C_StructureController::apiGet/$1', ['filter' => 'permission:6,15,1']);
+    $routes->get('structures', 'C_StructureController::index', ['filter' => 'permission:8,15,1']);
+    $routes->post('structures/store', 'C_StructureController::store', ['filter' => 'permission:8,15,2']);
+    $routes->get('structures/show/(:num)', 'C_StructureController::show/$1', ['filter' => 'permission:8,15,1']);
+    $routes->get('structures/edit/(:num)', 'C_StructureController::edit/$1', ['filter' => 'permission:8,15,3']);
+    $routes->post('structures/update/(:num)', 'C_StructureController::update/$1', ['filter' => 'permission:8,15,3']);
+    $routes->post('structures/delete/(:num)', 'C_StructureController::destroy/$1', ['filter' => 'permission:8,15,4']);
+    $routes->get('structures/api/get/(:num)', 'C_StructureController::apiGet/$1', ['filter' => 'permission:8,15,1']);
 
     // Configuration des référentiels des structures
     // L'alias court est conservé pour les liens déjà utilisés.
@@ -67,19 +67,36 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('configuration-structures', 'C_ConfigurationController::structures', ['filter' => 'permission:6,6,1']);
 
     // CRUD des référentiels
-    foreach (['types-offre', 'langues', 'sites', 'statuts', 'financements', 'programmes', 'etats', 'nomenclature', 'codification'] as $referentiel) {
-        $routes->get('parametres/' . $referentiel, 'C_ReferentielController::index/' . $referentiel, ['filter' => 'permission:6,6,1']);
-        $routes->post('parametres/' . $referentiel . '/store', 'C_ReferentielController::store/' . $referentiel, ['filter' => 'permission:6,6,2']);
-        $routes->post('parametres/' . $referentiel . '/update/(:num)', 'C_ReferentielController::update/' . $referentiel . '/$1', ['filter' => 'permission:6,6,3']);
-        $routes->post('parametres/' . $referentiel . '/delete/(:num)', 'C_ReferentielController::delete/' . $referentiel . '/$1', ['filter' => 'permission:6,6,4']);
+    // Les permissions sont définies par les menus en base, mais les routes
+    // doivent rester chargeables par Spark même si la base est indisponible.
+    $configurationId = 12;
+    $configurationSubMenuIds = [
+        'types-offre' => 28,
+        'langues' => 29,
+        'sites' => 30,
+        'statuts' => 31,
+        'financements' => 32,
+        'programmes' => 33,
+        'etats' => 34,
+        'nomenclature' => 35,
+        'codification' => 36,
+    ];
+
+    foreach (array_keys($configurationSubMenuIds) as $referentiel) {
+        $subMenuId = $configurationSubMenuIds[$referentiel];
+        $permissionPrefix = 'permission:' . $configurationId . ',' . $subMenuId . ',';
+        $routes->get('configuration/' . $referentiel, 'C_ReferentielController::index/' . $referentiel, ['filter' => $permissionPrefix . '1']);
+        $routes->post('configuration/' . $referentiel . '/store', 'C_ReferentielController::store/' . $referentiel, ['filter' => $permissionPrefix . '2']);
+        $routes->post('configuration/' . $referentiel . '/update/(:num)', 'C_ReferentielController::update/' . $referentiel . '/$1', ['filter' => $permissionPrefix . '3']);
+        $routes->post('configuration/' . $referentiel . '/delete/(:num)', 'C_ReferentielController::delete/' . $referentiel . '/$1', ['filter' => $permissionPrefix . '4']);
     }
 
     // Users
-    $routes->get('users', 'C_UserController::index', ['filter' => 'permission:6,6,1']);
-    $routes->post('users/save_user', 'C_UserController::save_user', ['filter' => 'permission:6,6,2']);
-    $routes->post('users/block/(:num)', 'C_UserController::block/$1', ['filter' => 'permission:6,6,3']);
-    $routes->post('users/delete/(:num)', 'C_UserController::delete/$1', ['filter' => 'permission:6,6,4']);
-    $routes->post('users/update', 'C_UserController::update', ['filter' => 'permission:6,6,3']);
+    $routes->get('users', 'C_UserController::index', ['filter' => 'permission:6,11,1']);
+    $routes->post('users/save_user', 'C_UserController::save_user', ['filter' => 'permission:6,11,2']);
+    $routes->post('users/block/(:num)', 'C_UserController::block/$1', ['filter' => 'permission:6,11,3']);
+    $routes->post('users/delete/(:num)', 'C_UserController::delete/$1', ['filter' => 'permission:6,11,4']);
+    $routes->post('users/update', 'C_UserController::update', ['filter' => 'permission:6,11,3']);
 
 
 
@@ -97,13 +114,13 @@ $routes->get('users/search-personnel', 'C_UserController::search_personnel');
     $routes->get('menus/delete-submenu/(:num)', 'C_MenuController::deleteSubMenu/$1', ['filter' => 'permission:6,17,4']);
 
     // Profils
-    $routes->get('profils', 'C_ProfilController::index', ['filter' => 'permission:6,6,1']);
-    $routes->get('profils/get/(:num)', 'C_ProfilController::getProfil/$1', ['filter' => 'permission:6,6,1']);
-    $routes->post('profils/update', 'C_ProfilController::update', ['filter' => 'permission:6,6,3']);
-    $routes->post('profils/delete/(:num)', 'C_ProfilController::delete/$1', ['filter' => 'permission:6,6,4']);
-    $routes->post('profils/delete_ajax/(:num)', 'C_ProfilController::delete_ajax/$1', ['filter' => 'permission:6,6,4']);
-    $routes->post('profils/save', 'C_ProfilController::save', ['filter' => 'permission:6,6,2']);
-    $routes->get('profils/getProfil/(:num)', 'Profils::getProfil/$1', ['filter' => 'permission:6,6,1']);
+    $routes->get('profils', 'C_ProfilController::index', ['filter' => 'permission:6,12,1']);
+    $routes->get('profils/get/(:num)', 'C_ProfilController::getProfil/$1', ['filter' => 'permission:6,12,1']);
+    $routes->post('profils/update', 'C_ProfilController::update', ['filter' => 'permission:6,12,3']);
+    $routes->post('profils/delete/(:num)', 'C_ProfilController::delete/$1', ['filter' => 'permission:6,12,4']);
+    $routes->post('profils/delete_ajax/(:num)', 'C_ProfilController::delete_ajax/$1', ['filter' => 'permission:6,12,4']);
+    $routes->post('profils/save', 'C_ProfilController::save', ['filter' => 'permission:6,12,2']);
+    $routes->get('profils/getProfil/(:num)', 'Profils::getProfil/$1', ['filter' => 'permission:6,12,1']);
 
     if (function_exists('registerDynamicMenuRoutes')) {
         registerDynamicMenuRoutes($routes, [
@@ -123,4 +140,5 @@ $routes->get('users/search-personnel', 'C_UserController::search_personnel');
             'logout',
         ]);
     }
+    
 });

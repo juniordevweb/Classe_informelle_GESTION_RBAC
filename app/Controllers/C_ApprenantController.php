@@ -20,7 +20,7 @@ class C_ApprenantController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
-        $perPage = 3;
+        $perPage = 6;
         $selectedClassId = (int) $this->request->getGet('classe_id');
         $data['open_add_modal'] = $this->request->getGet('open_modal') === '1';
         $selectedClassName = null;

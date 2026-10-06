@@ -63,6 +63,15 @@ class PermissionFilter implements FilterInterface
 
         if (!$permission) {
             $landingUrl = getDefaultLandingUrl($permissions, '/login');
+            $currentPath = trim($request->getUri()->getPath(), '/');
+            $landingPath = trim(parse_url($landingUrl, PHP_URL_PATH) ?: $landingUrl, '/');
+
+            // Évite une boucle si la page d'accueil calculée est elle-même refusée.
+            if ($landingPath === '' || $landingPath === $currentPath || $landingPath === 'login') {
+                return service('response')
+                    ->setStatusCode(403)
+                    ->setBody($this->getDeniedMessage($permissionId));
+            }
 
             return redirect()->to($landingUrl)->with('access_denied', $this->getDeniedMessage($permissionId));
         }

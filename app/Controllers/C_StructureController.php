@@ -109,7 +109,7 @@ class C_StructureController extends BaseController
             return redirect()->to('/dashboard')->with('error', 'Accès non autorisé.');
         }
 
-        $perPage = 3;
+        $perPage = 6;
         $page = $this->request->getGet('page') ?? 1;
         $search = $this->request->getGet('search');
         $region = $this->request->getGet('region');

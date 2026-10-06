@@ -25,6 +25,7 @@ class Pager extends BaseConfig
         'default_simple' => 'CodeIgniter\Pager\Views\default_simple',
         'default_head'   => 'CodeIgniter\Pager\Views\default_head',
         'prev_next'      => 'App\Views\pagers\prev_next',
+        'arrows_only'    => 'App\Views\pagers\arrows_only',
     ];
 
     /**

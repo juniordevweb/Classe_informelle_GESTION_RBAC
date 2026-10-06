@@ -13,7 +13,11 @@ $hasProfilActionPermission = static function (array $permissions, int $menuId, i
 
         if (
             (int) ($permission['menu_id'] ?? 0) === $menuId &&
-            $dbSousMenu === $sousMenuId &&
+            (
+                $dbSousMenu === $sousMenuId ||
+                // Compatibilité avec les anciennes permissions globales de Paramètres.
+                ($menuId === 6 && $sousMenuId === 12 && $dbSousMenu === 6)
+            ) &&
             (int) ($permission['permission_id'] ?? 0) === $permissionId
         ) {
             return true;
@@ -23,9 +27,9 @@ $hasProfilActionPermission = static function (array $permissions, int $menuId, i
     return false;
 };
 
-$canAddProfil = $hasProfilActionPermission($user_permissions, 6, 6, 2);
-$canEditProfil = $hasProfilActionPermission($user_permissions, 6, 6, 3);
-$canDeleteProfil = $hasProfilActionPermission($user_permissions, 6, 6, 4);
+$canAddProfil = $hasProfilActionPermission($user_permissions, 6, 12, 2);
+$canEditProfil = $hasProfilActionPermission($user_permissions, 6, 12, 3);
+$canDeleteProfil = $hasProfilActionPermission($user_permissions, 6, 12, 4);
 $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
 ?><br><br><br>
 
@@ -90,6 +94,11 @@ $showProfilActionsColumn = $canEditProfil || $canDeleteProfil;
                         </tbody>
                     </table>
                 </div>
+                <?php if (isset($pager)): ?>
+                    <div class="d-flex justify-content-center mt-3">
+                        <?= $pager->simpleLinks('roles', 'prev_next') ?>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -254,7 +263,8 @@ let selectedPermissions = [];
 
 document.addEventListener("DOMContentLoaded", function() {
     // ================== GLOBAL ==================
-   const GLOBAL_MENU_IDS = ['6'];
+   // Chaque sous-menu doit conserver un jeu de permissions indépendant.
+   const GLOBAL_MENU_IDS = [];
 
    function normalizeSousMenuId(menuId, sousMenuId) {
        return GLOBAL_MENU_IDS.includes(String(menuId)) ? String(menuId) : String(sousMenuId);
@@ -297,7 +307,11 @@ return currentPerms.some(p => {
 
 return (
 String(p.menu_id) === String(menuId) &&
-(p.sous_menu_id == 0 || String(p.sous_menu_id) === String(normalizedSousMenuId)) &&
+(
+    String(p.sous_menu_id) === String(normalizedSousMenuId) ||
+    // Compatibilité avec les anciennes permissions du sous-menu users (id 6).
+    (String(menuId) === '6' && String(normalizedSousMenuId) === '11' && String(p.sous_menu_id) === '6')
+) &&
 String(p.permission_id) === String(permId)
 );
 
@@ -499,11 +513,15 @@ syncAddSelectedPermissions();
                 cancelButtonText: 'Annuler'
                     }).then(result => {
                         if(result.isConfirmed){
+                            const deleteData = new FormData();
+                            deleteData.append(CSRF_TOKEN_NAME, CSRF_TOKEN_HASH);
+
                             fetch("<?= base_url('profils/delete_ajax') ?>/"+id, {
                                 method: 'POST',
+                                body: deleteData,
+                                credentials: 'same-origin',
                                 headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    [CSRF_TOKEN_NAME]: CSRF_TOKEN_HASH
+                                    'X-Requested-With': 'XMLHttpRequest'
                                 }
                             }).then(res => res.json())
                             .then(data => {

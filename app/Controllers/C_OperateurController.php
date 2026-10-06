@@ -18,7 +18,7 @@ class C_OperateurController extends BaseController
     public function index()
     {
         $this->ensureOperateurTable();
-        $perPage = 3;
+        $perPage = 6;
 
         $data['user_permissions'] = $this->getUserPermissions();
         $data['operateurs'] = $this->operateurModel->orderBy('id', 'DESC')->paginate($perPage, 'operateurs');

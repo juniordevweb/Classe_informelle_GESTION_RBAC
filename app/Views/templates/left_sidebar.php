@@ -219,6 +219,16 @@ $directMenuRoutes = [
                         $children = $menu['children'] ?? [];
                         $resolvedRoute = $directMenuRoutes[$menuId] ?? $menuRoute;
                         $menuHref = $resolvedRoute !== '' ? base_url($resolvedRoute) : '';
+
+                        // Certains anciens enregistrements créent un faux sous-menu
+                        // portant le même lien que le menu parent. Il ne doit pas
+                        // transformer un menu simple en menu à deux clics.
+                        if ($resolvedRoute !== '' && ! empty($children)) {
+                            $children = array_values(array_filter($children, static function (array $child) use ($resolvedRoute): bool {
+                                return trim((string) ($child['url'] ?? ''), '/') !== trim($resolvedRoute, '/');
+                            }));
+                        }
+
                         $menuActive = $currentRoute !== '' && $resolvedRoute !== '' && $currentRoute === $resolvedRoute;
                         foreach ($children as $child) {
                             $childRoute = trim((string) ($child['url'] ?? ''), '/');
@@ -227,8 +237,9 @@ $directMenuRoutes = [
                                 break;
                             }
                         }
+                        
 
-                        $isDropdownMenu = $isParametersMenu($menu) && ! empty($children);
+                        $isDropdownMenu = ! empty($children);
                     ?>
                         <?php if ($isDropdownMenu): ?>
                             <li class="has_sub <?= $menuActive ? 'active' : '' ?>">

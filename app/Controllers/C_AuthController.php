@@ -20,7 +20,15 @@ class C_AuthController extends BaseController
                 return redirect()->to('/password/reset');
             }
 
-            return redirect()->to(getDefaultLandingUrl(session()->get('user_permissions') ?? []));
+            $landingUrl = getDefaultLandingUrl(session()->get('user_permissions') ?? [], '/dashboard');
+            if (trim($landingUrl, '/') === 'login') {
+                session()->destroy();
+                return view('V_connexion', [
+                    'error' => 'Aucune page accessible n’est attribuée à votre profil.',
+                ]);
+            }
+
+            return redirect()->to($landingUrl);
         }
 
         return view('V_connexion');
@@ -55,6 +63,10 @@ class C_AuthController extends BaseController
 
         $roleName = $role ? $role['nom_role'] : 'Invite';
 
+        // Régénérer la session avant d'y stocker les permissions garantit
+        // qu'elles restent disponibles après la reconnexion.
+        session()->regenerate(true);
+
         session()->set([
             'user_id'          => $user['id'],
             'nom'              => $user['nom'],
@@ -66,8 +78,6 @@ class C_AuthController extends BaseController
             'logged_in'        => true,
         ]);
 
-        session()->regenerate(true);
-
         // Snapshot the sidebar at login time so menu changes become visible only after reconnection.
         session()->set('sidebar_menus', getSidebarMenus($permissions));
 
@@ -76,7 +86,13 @@ class C_AuthController extends BaseController
                 ->with('warning', 'Vous devez changer votre mot de passe initial avant d\'utiliser le système.');
         }
 
-        return redirect()->to(getDefaultLandingUrl($permissions));
+        $landingUrl = getDefaultLandingUrl($permissions, '/dashboard');
+        if (trim($landingUrl, '/') === 'login') {
+            session()->destroy();
+            return redirect()->to('/login')->with('error', 'Aucune page accessible n’est attribuée à votre profil.');
+        }
+
+        return redirect()->to($landingUrl);
         
     }
 

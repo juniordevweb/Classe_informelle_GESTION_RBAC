@@ -35,7 +35,8 @@ class C_UserController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
-        $data['users'] = $this->userModel->findAll();
+        $data['users'] = $this->userModel->orderBy('id', 'DESC')->paginate(6, 'users');
+        $data['pager'] = $this->userModel->pager;
         $data['profils'] = $this->roleModel->findAll();
 
         return view('V_GestionUser', $data);

@@ -18,7 +18,7 @@ class C_ClasseController extends BaseController
     public function index()
     {
         $data['user_permissions'] = $this->getUserPermissions();
-        $perPage = 3;
+        $perPage = 6;
         $data['classes'] = $this->classeModel->orderBy('id', 'DESC')->paginate($perPage, 'classes');
         $data['pager'] = $this->classeModel->pager;
         $data['structures'] = $this->getReferenceOptions('structures');

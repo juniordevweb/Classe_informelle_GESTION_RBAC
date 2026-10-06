@@ -2,14 +2,11 @@
 
 use CodeIgniter\Pager\PagerRenderer;
 
-/**
- * @var PagerRenderer $pager
- */
-$pager->setSurroundCount(0);
+/** @var PagerRenderer $pager */
 ?>
 <?php if ($pager->hasPrevious() || $pager->hasNext()): ?>
     <nav aria-label="Pagination">
-        <ul class="pagination justify-content-center align-items-center mb-0 gap-2">
+        <ul class="pagination mb-0">
             <li class="page-item <?= $pager->hasPrevious() ? '' : 'disabled' ?>">
                 <a class="page-link" href="<?= $pager->hasPrevious() ? $pager->getPrevious() : '#' ?>" aria-label="Page précédente">&lt;</a>
             </li>

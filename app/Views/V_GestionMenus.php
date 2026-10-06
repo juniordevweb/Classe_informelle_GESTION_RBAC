@@ -6,6 +6,8 @@
 $user_permissions = $user_permissions ?? [];
 $menus = $menus ?? [];
 $sous_menus = $sous_menus ?? [];
+$menuOptions = $menuOptions ?? $menus;
+$allSousMenus = $allSousMenus ?? $sous_menus;
 $permissions = $permissions ?? [];
 
 $hasMenuActionPermission = static function (array $permissionsList, int $menuId, int $sousMenuId, int $permissionId): bool {
@@ -39,12 +41,12 @@ foreach ($permissions as $permission) {
 }
 
 $menusById = [];
-foreach ($menus as $menu) {
+foreach ($menuOptions as $menu) {
     $menusById[(int) $menu['id']] = $menu;
 }
 
 $menuSubCounts = [];
-foreach ($sous_menus as $subMenu) {
+foreach ($allSousMenus as $subMenu) {
     if (trim((string) ($subMenu['url'] ?? ''), '/') === 'structures/create') {
         continue;
     }
@@ -136,12 +138,12 @@ $flashError = session()->getFlashdata('error');
                 <ul class="nav nav-tabs mb-4" id="menusTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link active" id="menus-tab" data-bs-toggle="tab" data-bs-target="#menus-pane" role="tab">
-                            Menus principaux <span class="badge bg-primary ms-1"><?= count($menus) ?></span>
+                            Menus principaux <span class="badge bg-primary ms-1"><?= count($menuOptions) ?></span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button type="button" class="nav-link" id="submenus-tab" data-bs-toggle="tab" data-bs-target="#submenus-pane" role="tab">
-                            Sous-menus <span class="badge bg-primary ms-1"><?= count($sous_menus) ?></span>
+                            Sous-menus <span class="badge bg-primary ms-1"><?= count($allSousMenus) ?></span>
                         </button>
                     </li>
                 </ul>
@@ -222,6 +224,11 @@ $flashError = session()->getFlashdata('error');
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            <?php if (isset($menusPager)): ?>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <?= $menusPager->simpleLinks('menus', 'prev_next') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -294,6 +301,11 @@ $flashError = session()->getFlashdata('error');
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
+                            <?php if (isset($sousMenusPager)): ?>
+                                <div class="d-flex justify-content-center mt-3">
+                                    <?= $sousMenusPager->simpleLinks('sous_menus', 'prev_next') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -431,7 +443,7 @@ $flashError = session()->getFlashdata('error');
                             <label class="form-label">Parent</label>
                             <select name="menu_id" class="form-select" required>
                                 <option value="">Choisir un menu parent</option>
-                                <?php foreach ($menus as $menu): ?>
+                                <?php foreach ($menuOptions as $menu): ?>
                                     <option value="<?= esc($menu['id']) ?>" <?= old('menu_id') == $menu['id'] ? 'selected' : '' ?>>
                                         <?= esc($menu['nom_menu']) ?>
                                     </option>
@@ -499,7 +511,7 @@ $flashError = session()->getFlashdata('error');
                         <div class="col-md-6">
                             <label class="form-label">Parent</label>
                             <select name="menu_id" id="editSubMenuParent" class="form-select" required>
-                                <?php foreach ($menus as $menu): ?>
+                                <?php foreach ($menuOptions as $menu): ?>
                                     <option value="<?= esc($menu['id']) ?>">
                                         <?= esc($menu['nom_menu']) ?>
                                     </option>

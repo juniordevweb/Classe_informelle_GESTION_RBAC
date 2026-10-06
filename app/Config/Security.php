@@ -71,7 +71,10 @@ class Security extends BaseConfig
      *
      * Regenerate CSRF Token on every submission.
      */
-    public bool $regenerate = true;
+    // Plusieurs formulaires peuvent être présents sur une même page. Garder
+    // le même jeton évite qu'un envoi dans un onglet rende les autres formulaires
+    // invalides tout en conservant la vérification CSRF.
+    public bool $regenerate = false;
 
     /**
      * --------------------------------------------------------------------------
